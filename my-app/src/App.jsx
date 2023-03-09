@@ -64,6 +64,16 @@ export default function Game() {
     setCurrentMove(nextHistory.length - 1);
   }
 
+  let status;
+  if (calculateWinner(currentSquares)) {
+    status = 'Winner: ' + calculateWinner(currentSquares);
+  } else {
+    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
+    if (currentMove < 9) {
+      status = `You are at move #${currentMove} ${status}`;
+    }
+  }
+
   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
   }
@@ -77,7 +87,11 @@ export default function Game() {
     }
     return (
       <li key={move}>
-        <button onClick={() => jumpTo(move)}>{description}</button>
+        {move === currentMove ? ( // Render message for current move only
+          <span>You are at move #{move}</span>
+        ) : (
+          <button onClick={() => jumpTo(move)}>{description}</button>
+        )}
       </li>
     );
   });
