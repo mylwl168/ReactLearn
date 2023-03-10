@@ -93,17 +93,19 @@ export default function Game() {
     setCurrentMove(nextMove);
   }
 
-
   const moves = history.map((squares, move) => {
     let description;
     if (move > 0) {
-      description = 'Go to move #' + move;
+
+      // Q5
+      const [prevRow, prevCol] = calculateRowAndCol(history[move - 1], squares);
+      description = `Go to move #${move}, Row: ${prevRow}, Col: ${prevCol}`;
     } else {
       description = 'Go to game start';
     }
     return (
       <li key={move}>
-        {move === currentMove ? ( // Render message for current move only
+        {move === currentMove ? (
           <span>You are at move #{move}</span>
         ) : (
           <button onClick={() => jumpTo(move)}>{description}</button>
@@ -112,14 +114,14 @@ export default function Game() {
     );
   });
 
-  if (!isAscending) { // Q3
+  if (!isAscending) {
     moves.reverse();
   }
 
   return (
     <div className="game">
       <div className="game-board">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} winnerSquares={winnerSquares}/>
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} winnerSquares={winnerSquares} />
       </div>
       <div className="game-info">
         <div>
@@ -168,6 +170,18 @@ function calculateWinnerIndex(squares) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
       return [a, b, c];
+    }
+  }
+  return null;
+}
+
+// Q5:ボード上の位置を表すインデックスを取得し、それを基に行と列の番号を計算します。
+function calculateRowAndCol(prevSquares, nextSquares) {
+  for (let i = 0; i < nextSquares.length; i++) {
+    if (prevSquares[i] !== nextSquares[i]) {
+      const row = Math.floor(i / 3) + 1;
+      const col = (i % 3) + 1;
+      return [row, col];
     }
   }
   return null;
