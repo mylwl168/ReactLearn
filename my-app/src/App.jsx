@@ -1,13 +1,14 @@
 import { useState } from 'react';
 
-function Square({ value, onSquareClick }) {
+function Square({ value, onSquareClick, isHighlighted }) {
   return (
-    <button className="square" onClick={onSquareClick}>
+    <button className={`square ${isHighlighted ? 'highlighted' : ''}`} onClick={onSquareClick}>
       {value}
     </button>
   );
 }
-function Board({ xIsNext, squares, onPlay }) {
+
+function Board({ xIsNext, squares, onPlay, winnerSquares }) {
   function handleClick(i) {
     if (calculateWinner(squares) || squares[i]) {
       return;
@@ -25,6 +26,8 @@ function Board({ xIsNext, squares, onPlay }) {
   let status;
   if (winner) {
     status = 'Winner: ' + winner;
+  } else if (!squares.includes(null)) {
+    status = 'Draw';
   } else {
     status = 'Next player: ' + (xIsNext ? 'X' : 'O');
   }
@@ -34,8 +37,14 @@ function Board({ xIsNext, squares, onPlay }) {
     const rowSquares = [];
     for (let j = 0; j < 3; j++) {
       const index = i * 3 + j;
+      const isHighlighted = winnerSquares && winnerSquares.includes(index);
       rowSquares.push(
-        <Square key={index} value={squares[index]} onSquareClick={() => handleClick(index)} />
+        <Square
+          key={index}
+          value={squares[index]}
+          onSquareClick={() => handleClick(index)}
+          isHighlighted={isHighlighted}
+        />
       );
     }
     boardRows.push(<div key={i} className="board-row">{rowSquares}</div>);
@@ -54,7 +63,8 @@ export default function Game() {
   const [currentMove, setCurrentMove] = useState(0);
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
-  const [isAscending, setIsAscending] = useState(true); // Q3
+  const [isAscending, setIsAscending] = useState(true);
+  const winnerSquares = calculateWinner(currentSquares);
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
@@ -63,8 +73,10 @@ export default function Game() {
   }
 
   let status;
-  if (calculateWinner(currentSquares)) {
-    status = 'Winner: ' + calculateWinner(currentSquares);
+  if (winnerSquares) {
+    status = 'Winner: ' + currentSquares[winnerSquares[0]];
+  } else if (!currentSquares.includes(null)) {
+    status = 'Draw';
   } else {
     status = 'Next player: ' + (xIsNext ? 'X' : 'O');
     if (currentMove < 9) {
@@ -75,6 +87,7 @@ export default function Game() {
   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
   }
+
 
   const moves = history.map((squares, move) => {
     let description;
