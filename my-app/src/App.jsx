@@ -32,12 +32,17 @@ function Board({ xIsNext, squares, onPlay, winnerSquares }) {
     status = 'Next player: ' + (xIsNext ? 'X' : 'O');
   }
 
+  const winnerSquaresIndex = calculateWinnerIndex(squares);
   const boardRows = [];
+  let isHighlighted = false;
   for (let i = 0; i < 3; i++) {
     const rowSquares = [];
     for (let j = 0; j < 3; j++) {
       const index = i * 3 + j;
-      const isHighlighted = winnerSquares && winnerSquares.includes(index);
+      isHighlighted = false;
+      if (winnerSquaresIndex && winnerSquaresIndex.includes(index)) {
+        isHighlighted = true;
+      }
       rowSquares.push(
         <Square
           key={index}
@@ -114,7 +119,7 @@ export default function Game() {
   return (
     <div className="game">
       <div className="game-board">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} winnerSquares={winnerSquares}/>
       </div>
       <div className="game-info">
         <div>
@@ -143,6 +148,26 @@ function calculateWinner(squares) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
       return squares[a];
+    }
+  }
+  return null;
+}
+
+function calculateWinnerIndex(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return [a, b, c];
     }
   }
   return null;

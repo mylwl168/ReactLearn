@@ -91,6 +91,6 @@ body {
 }
 
 .square.highlighted {
-  background: #f00;
-  color: #fff;
+  background: rgb(255, 255, 0);
+  color: #000;
   }
