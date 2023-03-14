@@ -1,0 +1,52 @@
+はじめに		
+TypeScriptのあらまし		
+	TypeScriptの特徴	〇
+	JavaScriptはTypeScriptの一部	〇
+	TypeScript誕生の背景	〇
+	TypeScriptとエコシステム	〇
+	なぜTypeScriptを使うべきか	〇
+	静的型付け	〇
+	ECMAScript	〇
+	TypeScriptの射程	〇
+	TypeScriptは何ではないか？	〇
+作って学ぶTypeScript		
+	開発環境の準備	〇
+	簡単な関数を作ってみよう	〇
+	Reactでいいねボタンを作ろう	〇
+	Next.jsで猫画像ジェネレーターを作ろう	×
+	Vercelにデプロイしてみよう	×
+	Jestでテストを書こう	×
+	Reactコンポーネントのテストを書こう	×
+	Prettierでコード整形を自動化しよう	×
+	ESLintでコーディング規約を自動化しよう	×
+	🚧huskyでコミット前チェックを自動化しよう	×
+読んで学ぶTypeScript		
+	値・型・変数	
+	文	
+	関数	
+	🚧非同期処理	
+	Promise / async / await	
+	オブジェクト指向	
+	組み込みAPI	
+	🚧モジュール	
+	import、export、require	
+	シングルプロセス・シングルスレッドとコールバック	
+	型の再利用	
+	ジェネリクス	
+	tsconfig	
+	型定義ファイル	
+	Advanced Topics	
+Tips		
+	オブジェクトを浅くコピーする	
+	オブジェクトをマージ (結合) する	
+	オブジェクトのサブセットを得る	
+	オブジェクトで受け、オブジェクトを返す	
+	コンパニオンオブジェクトパターン	
+	オブジェクトから型を生成する	
+	オブジェクトからキーの型を生成する	
+	オブジェクトからプロパティの型を生成する	
+	配列から型を生成する	
+	配列から全要素の型を生成する	
+索引:記号とキーワード		
+TypeScript Playgroundの使い方		
+🚧TypeScript超入門 〜10分でわかるTypeScriptの概要〜		
