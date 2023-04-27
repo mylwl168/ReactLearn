@@ -1,0 +1,69 @@
+当执行某些比较耗时的函数时，我们想要显示一个Spinner组件来表示正在加载。我们可以使用React的Context API来共享状态并在需要时显示Spinner组件。我们可以创建一个SpinnerContext对象来管理Spinner组件的显示/隐藏状态。
+
+首先，我们需要创建一个SpinnerContext对象，它包含isLoading状态和setIsLoading方法，用于显示或隐藏Spinner组件。
+
+typescript
+Copy code
+import React from "react";
+
+interface SpinnerContextProps {
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
+}
+
+export const SpinnerContext = React.createContext<SpinnerContextProps>({
+  isLoading: false,
+  setIsLoading: () => {},
+});
+接下来，我们可以创建一个Spinner组件来在需要时显示或隐藏。
+
+typescript
+Copy code
+import React, { useContext } from "react";
+import { SpinnerContext } from "./SpinnerContext";
+
+export const Spinner = () => {
+  const { isLoading } = useContext(SpinnerContext);
+
+  return isLoading ? <div>Spinner</div> : null;
+};
+现在，我们可以创建一个showSpinner函数，它接受一个回调函数并在执行回调函数期间显示Spinner组件。
+
+typescript
+Copy code
+import React, { useContext } from "react";
+import { SpinnerContext } from "./SpinnerContext";
+
+export const showSpinner = async (callback: () => Promise<void>) => {
+  const { setIsLoading } = useContext(SpinnerContext);
+
+  setIsLoading(true);
+  await callback();
+  setIsLoading(false);
+};
+我们现在可以在其他组件中使用showSpinner函数，并将需要显示Spinner的函数作为参数传递。
+
+typescript
+Copy code
+import React from "react";
+import { Spinner } from "./Spinner";
+import { showSpinner } from "./showSpinner";
+
+export const App = () => {
+  const fetchData = async () => {
+    // Simulate an API call
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  };
+
+  const handleButtonClick = async () => {
+    await showSpinner(fetchData);
+  };
+
+  return (
+    <div>
+      <button onClick={handleButtonClick}>Fetch Data</button>
+      <Spinner />
+    </div>
+  );
+};
+在上面的例子中，我们创建了一个handleButtonClick函数，它使用showSpinner函数来显示Spinner并异步执行fetchData函数。当fetchData函数完成时，Spinner将被隐藏。
