@@ -1,0 +1,32 @@
+はい、JSXの場合と同様に、TypeScriptの場合もドキュメントをコメントで記述することができます。ただし、TypeScriptの場合は、コメントにJSDocを使用することが一般的です。以下は、JSXの例と同様のコンポーネントをTypeScriptで記述した場合の例です。
+
+tsx
+Copy code
+/**
+ * コンポーネントの説明
+ */
+interface MyComponentProps {
+  /** 名前 */
+  name: string;
+  /** メッセージ */
+  message?: string;
+}
+
+/**
+ * コンポーネント
+ * @param props - プロパティ
+ * @returns コンポーネント
+ */
+function MyComponent({ name, message = 'Hello, world!' }: MyComponentProps): JSX.Element {
+  return (
+    <div>
+      <p>{message}</p>
+      <p>{name}</p>
+    </div>
+  );
+}
+この例では、JSDocを使用して、MyComponentの説明と、それが受け取るプロパティが記述されています。JSDocを使用することで、TypeScriptの型情報をコメントに含めることができます。
+
+TypeScriptでのドキュメントの書き方については、以下のリンクも参考にしてください。
+
+TypeScript Handbook - Documentation
