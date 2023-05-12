@@ -22,3 +22,16 @@ sql
 Copy code
 npm install vitest @testing-library/react @testing-library/jest-dom --save-dev
 上記のコマンドで、vitestとTesting Libraryがインストールされます。また、@testing-library/jest-domも一緒にインストールすることをおすすめします。@testing-library/jest-domは、Testing Libraryで提供されるDOMマッチャーをJestで使えるようにするためのライブラリです。
+
+
+import React from "react";
+
+interface ButtonProps {
+  onClick?: () => void;
+}
+
+const Button: React.FC<ButtonProps> = ({ onClick, children }) => {
+  return <button onClick={onClick}>{children}</button>;
+};
+
+export default Button;
