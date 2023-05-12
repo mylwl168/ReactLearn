@@ -14,3 +14,11 @@ describe("Button component", () => {
     expect(onClick).toHaveBeenCalled();
   });
 });
+
+
+はい、vitestとTesting Libraryはインストールする必要があります。以下は、npmを使ったインストール方法です。
+
+sql
+Copy code
+npm install vitest @testing-library/react @testing-library/jest-dom --save-dev
+上記のコマンドで、vitestとTesting Libraryがインストールされます。また、@testing-library/jest-domも一緒にインストールすることをおすすめします。@testing-library/jest-domは、Testing Libraryで提供されるDOMマッチャーをJestで使えるようにするためのライブラリです。
