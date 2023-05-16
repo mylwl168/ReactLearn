@@ -12,16 +12,11 @@ const MyComponent = () => {
   return <div>{value}</div>;
 };
 
-jest.mock('./path/to/usexxxContext', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}));
-
 describe('MyComponent', () => {
   test('should render correctly with mocked usexxxContext', () => {
     const customValue = 'Custom Value';
 
-    usexxxContext.mockReturnValue(customValue);
+    jest.spyOn(React, 'useContext').mockReturnValue(customValue);
 
     const { getByText } = render(<MyComponent />);
 
