@@ -1,16 +1,24 @@
-先，创建一个模拟的 useContext 函数，以便在测试中使用：
+import { render } from 'vitest';
+import { createContext, useContext } from 'react';
 
-jsx
-Copy code
+const xxxContext = createContext(null);
+
+const usexxxContext = () => {
+  return useContext(xxxContext);
+};
+
+const MyComponent = () => {
+  const value = usexxxContext();
+  return <div>{value}</div>;
+};
+
+// Mock useContext
 const mockUseContext = jest.fn();
 jest.mock('react', () => ({
   ...jest.requireActual('react'),
   useContext: () => mockUseContext(),
 }));
-接下来，在测试中，你可以使用 mockUseContext.mockReturnValue 来模拟 useContext 的返回值：
 
-jsx
-Copy code
 test('should render correctly with mocked usexxxContext', () => {
   const customValue = 'Custom Value';
 
