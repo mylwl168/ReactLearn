@@ -1,6 +1,6 @@
 import { render } from 'vitest';
 import { createContext, useContext } from 'react';
-import sinon from 'sinon';
+import { fn } from 'jest-mock';
 
 const xxxContext = createContext(null);
 
@@ -17,26 +17,12 @@ describe('MyComponent', () => {
   test('should render correctly with mocked usexxxContext', () => {
     const customValue = 'Custom Value';
 
-    const useContextStub = sinon.stub(React, 'useContext');
-    useContextStub.withArgs(xxxContext).returns(customValue);
+    const useContextMock = fn().mockReturnValue(customValue);
+
+    jest.spyOn(React, 'useContext').mockImplementation(() => useContextMock());
 
     const { getByText } = render(<MyComponent />);
 
     expect(getByText(customValue)).toBeInTheDocument();
-
-    useContextStub.restore();
   });
 });
-在上述示例中，我们使用 Sinon.js 的 stub 方法来创建 useContext 的模拟函数。我们使用 withArgs 方法来指定对 xxxContext 的调用，并使用 returns 方法来指定返回的自定义值 customValue。
-
-这样，在测试中，我们可以模拟 usexxxContext 的行为，并断言渲染的结果是否正确。
-
-请确保在测试文件中正确导入 Sinon.js，并使用正确的方式创建模拟函数并进行断言。
-
-这种方式允许你在 vitest 和 Testing Library 的基础上使用 Sinon.js 进行模拟，以满足你的测试需求。
-
-
-
-
-
-
