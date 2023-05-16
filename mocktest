@@ -1,15 +1,24 @@
-npm install ts-jest --save-dev
-在 jest.config.js 文件中添加以下配置：
-javascript
+先，创建一个模拟的 useContext 函数，以便在测试中使用：
+
+jsx
 Copy code
-module.exports = {
-  // 其他配置选项...
+const mockUseContext = jest.fn();
+jest.mock('react', () => ({
+  ...jest.requireActual('react'),
+  useContext: () => mockUseContext(),
+}));
+接下来，在测试中，你可以使用 mockUseContext.mockReturnValue 来模拟 useContext 的返回值：
 
-  transform: {
-    '^.+\\.tsx?$': 'ts-jest',
-  },
+jsx
+Copy code
+test('should render correctly with mocked usexxxContext', () => {
+  const customValue = 'Custom Value';
 
-  testRegex: '(/tests/.*|(\\.|/)(test|spec))\\.tsx?$',
+  mockUseContext.mockReturnValue(customValue);
 
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-};
+  const { getByText } = render(<MyComponent />);
+
+  expect(getByText(customValue)).toBeTruthy();
+
+  mockUseContext.mockReset(); // 重置模拟的函数
+});
