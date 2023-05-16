@@ -1,0 +1,30 @@
+import { render } from 'vitest';
+import { createContext, useContext } from 'react';
+
+const xxxContext = createContext(null);
+
+const usexxxContext = () => {
+  return useContext(xxxContext);
+};
+
+const MyComponent = () => {
+  const value = usexxxContext();
+  return <div>{value}</div>;
+};
+
+jest.mock('./path/to/usexxxContext', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
+describe('MyComponent', () => {
+  test('should render correctly with mocked usexxxContext', () => {
+    const customValue = 'Custom Value';
+
+    usexxxContext.mockReturnValue(customValue);
+
+    const { getByText } = render(<MyComponent />);
+
+    expect(getByText(customValue)).toBeInTheDocument();
+  });
+});
