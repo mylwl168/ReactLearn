@@ -1,28 +1,15 @@
-import { render } from 'vitest';
-import { createContext, useContext } from 'react';
-import { fn } from 'jest-mock';
+npm install ts-jest --save-dev
+在 jest.config.js 文件中添加以下配置：
+javascript
+Copy code
+module.exports = {
+  // 其他配置选项...
 
-const xxxContext = createContext(null);
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest',
+  },
 
-const usexxxContext = () => {
-  return useContext(xxxContext);
+  testRegex: '(/tests/.*|(\\.|/)(test|spec))\\.tsx?$',
+
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 };
-
-const MyComponent = () => {
-  const value = usexxxContext();
-  return <div>{value}</div>;
-};
-
-describe('MyComponent', () => {
-  test('should render correctly with mocked usexxxContext', () => {
-    const customValue = 'Custom Value';
-
-    const useContextMock = fn().mockReturnValue(customValue);
-
-    jest.spyOn(React, 'useContext').mockImplementation(() => useContextMock());
-
-    const { getByText } = render(<MyComponent />);
-
-    expect(getByText(customValue)).toBeInTheDocument();
-  });
-});
