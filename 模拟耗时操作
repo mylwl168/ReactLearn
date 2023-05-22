@@ -1,0 +1,16 @@
+  const doHeavyWork = (iteration) => {
+    return new Promise((resolve) => {
+      // 模拟耗时操作
+      const startTime = Date.now();
+      let currentTime = Date.now();
+
+      while (currentTime - startTime < 10) {
+        // 进行一些计算或操作
+        currentTime = Date.now();
+      }
+
+      const currentResult = `当前迭代：${iteration}`;
+      setResult(currentResult);
+      resolve();
+    });
+  };
