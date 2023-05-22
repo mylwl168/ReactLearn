@@ -1,16 +1,26 @@
-  const doHeavyWork = (iteration) => {
-    return new Promise((resolve) => {
+function MyComponent() {
+  const syncExecution = async () => {
+    const arr = [1, 2, 3, 4, 5];
+    
+    await arr.reduce(async (previousPromise, item) => {
+      await previousPromise; // 等待上一个 Promise 完成
+      
       // 模拟耗时操作
-      const startTime = Date.now();
-      let currentTime = Date.now();
-
-      while (currentTime - startTime < 10) {
-        // 进行一些计算或操作
-        currentTime = Date.now();
-      }
-
-      const currentResult = `当前迭代：${iteration}`;
-      setResult(currentResult);
-      resolve();
-    });
+      await new Promise(resolve => {
+        // 这里可以是一些需要同步执行的操作
+        console.log(`Processing item: ${item}`);
+        resolve();
+      });
+    }, Promise.resolve());
+    
+    console.log('All items processed');
   };
+
+  useEffect(() => {
+    syncExecution();
+  }, []);
+
+  return <div>React Component</div>;
+}
+
+export default MyComponent;
