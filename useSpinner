@@ -1,0 +1,49 @@
+import React, { useState } from 'react';
+
+const useSpinner = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const runSpinner = async (callback) => {
+    setIsLoading(true);
+
+    try {
+      await callback();
+    } catch (error) {
+      console.error(error);
+    }
+
+    setIsLoading(false);
+  };
+
+  return { isLoading, runSpinner };
+};
+
+const SpinnerComponent = () => {
+  const { isLoading, runSpinner } = useSpinner();
+
+  const simulateHeavyTask = () => {
+    return new Promise((resolve) => {
+      // 模拟耗时操作
+      setTimeout(() => {
+        resolve();
+      }, 2000);
+    });
+  };
+
+  const handleClick = () => {
+    runSpinner(async () => {
+      console.log('开始执行重任务');
+      await simulateHeavyTask();
+      console.log('重任务执行完成');
+    });
+  };
+
+  return (
+    <div>
+      <button onClick={handleClick}>运行重任务</button>
+      {isLoading && <div>加载中...</div>}
+    </div>
+  );
+};
+
+export default SpinnerComponent;
