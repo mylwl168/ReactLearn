@@ -1,26 +1,29 @@
 function MyComponent() {
   const syncExecution = async () => {
-    const arr = [1, 2, 3, 4, 5];
-    
-    await arr.reduce(async (previousPromise, item) => {
-      await previousPromise; // 等待上一个 Promise 完成
-      
-      // 模拟耗时操作
-      await new Promise(resolve => {
-        // 这里可以是一些需要同步执行的操作
-        console.log(`Processing item: ${item}`);
-        resolve();
-      });
-    }, Promise.resolve());
-    
-    console.log('All items processed');
+    const arr = Array.from({ length: 100000 }, (_, index) => index + 1);
+
+    for (const item of arr) {
+      // モックの時間のかかる処理
+      await processItem(item);
+    }
+
+    console.log('すべてのアイテムが処理されました');
+  };
+
+  const processItem = async (item) => {
+    // モックの時間のかかる処理
+    await new Promise((resolve) => {
+      // 同期的に実行される処理です
+      console.log(`アイテムを処理中: ${item}`);
+      resolve();
+    });
   };
 
   useEffect(() => {
     syncExecution();
   }, []);
 
-  return <div>React Component</div>;
+  return <div>Reactコンポーネント</div>;
 }
 
 export default MyComponent;
