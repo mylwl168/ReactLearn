@@ -23,7 +23,6 @@ function IdleComponent() {
   function idleCallback(deadline: IdleDeadline) {
     // 如果浏览器还有空闲时间，或者已经超时，就执行 loop 操作
     if (deadline.timeRemaining() > 0 || deadline.didTimeout) {
-      setRunning(true); // 设置 running 状态为 true
       loop();
       setRunning(false); // 设置 running 状态为 false
     } else {
@@ -35,9 +34,11 @@ function IdleComponent() {
 
   // 定义一个按钮的点击事件处理函数
   function handleClick() {
-    // 请求 requestIdleCallback，并设置超时时间为 1000 毫秒
-    const newHandle = requestIdleCallback(idleCallback, { timeout: 1000 });
-    setHandle(newHandle);
+    // 设置 running 状态为 true，并在回调函数中请求 requestIdleCallback
+    setRunning(true, () => {
+      const newHandle = requestIdleCallback(idleCallback, { timeout: 1000 });
+      setHandle(newHandle);
+    });
   }
 
   // 使用 useEffect 在组件卸载时取消 requestIdleCallback
