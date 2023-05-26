@@ -96,3 +96,59 @@ function IdleComponent() {
     </div>
   );
 }
+
+
+----------------------
+
+
+
+// 定义一个需要循环 5 万次的操作，返回一个数字
+function idleCallback() {
+  // 循环的逻辑
+  // 返回一个数字
+  return number;
+}
+
+// 定义一个函数，用来请求一个空闲时间来执行 idleCallback 函数，并返回一个 Promise 对象
+function requestIdleTime(callback) {
+  return new Promise((resolve, reject) => {
+    // 请求一个空闲时间来执行回调函数
+    requestIdleCallback((deadline) => {
+      // 执行回调函数，并获取结果
+      let result = callback();
+      // 返回结果
+      resolve(result);
+    });
+  });
+}
+
+// 定义一个 React 组件
+function IdleComponent() {
+  // 定义一个状态变量来表示是否正在执行 loop 操作
+  const [running, setRunning] = React.useState(false);
+
+  // 定义一个按钮的点击事件处理函数
+  async function handleClick() {
+    // 设置 running 状态为 true，并在回调函数中执行 loop 函数
+    setRunning(true, async () => {
+      // 请求一个空闲时间来执行 idleCallback 函数，并获取结果
+      let result = await requestIdleTime(idleCallback);
+      // 打印结果
+      console.log(result);
+    });
+  }
+
+  // 根据 running 状态来渲染不同的 JSX 元素
+  return (
+    <div>
+      {running ? (
+        <div>运行中...</div>
+      ) : (
+        <div>
+          <button onClick={handleClick}>点击运行</button>
+        </div>
+      )}
+    </div>
+  );
+}
+export default IdleComponent;
