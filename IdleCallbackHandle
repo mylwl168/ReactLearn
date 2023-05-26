@@ -1,0 +1,59 @@
+// 引入 React 和 requestIdleCallback 的类型定义
+import React, { useEffect } from "react";
+import { IdleCallbackHandle } from "@types/requestidlecallback";
+
+// 定义一个需要循环 5 万次的操作
+function loop() {
+  let count = 0;
+  while (count < 50000) {
+    console.log(count);
+    count++;
+  }
+}
+
+// 定义一个 React 组件
+function IdleComponent() {
+  // 定义一个状态变量来存储 requestIdleCallback 的句柄
+  const [handle, setHandle] = React.useState<IdleCallbackHandle | null>(null);
+
+  // 定义一个状态变量来表示是否正在执行 loop 操作
+  const [running, setRunning] = React.useState(false);
+
+  // 定义一个 requestIdleCallback 的回调函数
+  function idleCallback(deadline: IdleDeadline) {
+    // 如果浏览器还有空闲时间，或者已经超时，就执行 loop 操作
+    if (deadline.timeRemaining() > 0 || deadline.didTimeout) {
+      setRunning(true); // 设置 running 状态为 true
+      loop();
+      setRunning(false); // 设置 running 状态为 false
+    } else {
+      // 否则，再次请求 requestIdleCallback
+      const newHandle = requestIdleCallback(idleCallback);
+      setHandle(newHandle);
+    }
+  }
+
+  // 使用 useEffect 在组件挂载时请求 requestIdleCallback，并在组件卸载时取消 requestIdleCallback
+  useEffect(() => {
+    const newHandle = requestIdleCallback(idleCallback, { timeout: 1000 });
+    setHandle(newHandle);
+    return () => {
+      if (handle) {
+        cancelIdleCallback(handle);
+      }
+    };
+  }, []);
+
+  // 根据 running 状态来渲染不同的 JSX 元素
+  return (
+    <div>
+      {running ? (
+        <div>运行中...</div>
+      ) : (
+        <div>Idle Component</div>
+      )}
+    </div>
+  );
+}
+
+export default IdleComponent;
