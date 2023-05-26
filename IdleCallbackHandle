@@ -33,10 +33,15 @@ function IdleComponent() {
     }
   }
 
-  // 使用 useEffect 在组件挂载时请求 requestIdleCallback，并在组件卸载时取消 requestIdleCallback
-  useEffect(() => {
+  // 定义一个按钮的点击事件处理函数
+  function handleClick() {
+    // 请求 requestIdleCallback，并设置超时时间为 1000 毫秒
     const newHandle = requestIdleCallback(idleCallback, { timeout: 1000 });
     setHandle(newHandle);
+  }
+
+  // 使用 useEffect 在组件卸载时取消 requestIdleCallback
+  useEffect(() => {
     return () => {
       if (handle) {
         cancelIdleCallback(handle);
@@ -50,7 +55,9 @@ function IdleComponent() {
       {running ? (
         <div>运行中...</div>
       ) : (
-        <div>Idle Component</div>
+        <div>
+          <button onClick={handleClick}>点击运行</button>
+        </div>
       )}
     </div>
   );
