@@ -60,3 +60,39 @@ useEffect(() => {
 }
 
 export default IdleComponent;
+
+
+
+
+// 定义一个 React 组件
+function IdleComponent() {
+  // 定义一个状态变量来表示是否正在执行 loop 操作
+  const [running, setRunning] = React.useState(false);
+
+  // 定义一个按钮的点击事件处理函数
+  function handleClick() {
+    // 设置 running 状态为 true
+    setRunning(true);
+  }
+
+  // 使用 useEffect 来监视 running 状态的变化
+  useEffect(() => {
+    // 如果 running 状态为 true，就执行 loop 函数
+    if (running) {
+      loop();
+    }
+  }, [running]);
+
+  // 根据 running 状态来渲染不同的 JSX 元素
+  return (
+    <div>
+      {running ? (
+        <div>运行中...</div>
+      ) : (
+        <div>
+          <button onClick={handleClick}>点击运行</button>
+        </div>
+      )}
+    </div>
+  );
+}
