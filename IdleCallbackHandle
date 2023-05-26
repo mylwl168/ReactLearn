@@ -19,36 +19,31 @@ function IdleComponent() {
   // 定义一个状态变量来表示是否正在执行 loop 操作
   const [running, setRunning] = React.useState(false);
 
-  // 定义一个 requestIdleCallback 的回调函数
-  function idleCallback(deadline: IdleDeadline) {
-    // 如果浏览器还有空闲时间，或者已经超时，就执行 loop 操作
-    if (deadline.timeRemaining() > 0 || deadline.didTimeout) {
-      loop();
-      setRunning(false); // 设置 running 状态为 false
-    } else {
-      // 否则，再次请求 requestIdleCallback
-      const newHandle = requestIdleCallback(idleCallback);
-      setHandle(newHandle);
-    }
+function idleCallback(deadline: IdleDeadline) {
+  // 如果浏览器还有空闲时间，或者已经超时，就执行 loop 操作
+  if (deadline.timeRemaining() > 0 || deadline.didTimeout) {
+    loop();
+    setRunning(false); // 设置 running 状态为 false
+  } else {
+    // 否则，再次请求 requestIdleCallback
+    const newHandle = requestIdleCallback(idleCallback);
+    setHandle(newHandle);
   }
+}
 
-  // 定义一个按钮的点击事件处理函数
-  function handleClick() {
-    // 设置 running 状态为 true，并在回调函数中请求 requestIdleCallback
-    setRunning(true, () => {
-      const newHandle = requestIdleCallback(idleCallback, { timeout: 1000 });
-      setHandle(newHandle);
-    });
+function handleClick() {
+  // 设置 running 状态为 true
+  setRunning(true);
+}
+
+// 使用 useEffect 来监听 running 状态的变化，并在 running 状态变为 true 时，执行 requestIdleCallback
+useEffect(() => {
+  if (running) {
+    const newHandle = requestIdleCallback(idleCallback, { timeout: 1000 });
+    setHandle(newHandle);
   }
+}, [running]);
 
-  // 使用 useEffect 在组件卸载时取消 requestIdleCallback
-  useEffect(() => {
-    return () => {
-      if (handle) {
-        cancelIdleCallback(handle);
-      }
-    };
-  }, []);
 
   // 根据 running 状态来渲染不同的 JSX 元素
   return (
