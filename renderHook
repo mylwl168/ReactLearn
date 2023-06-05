@@ -1,0 +1,52 @@
+import { renderHook, act } from '@testing-library/react-hooks'
+import { render, screen } from '@testing-library/react'
+import { ThemeProvider, ThemeContext } from './theme-provider'
+import { ReactNode } from 'react'
+
+function useTheme() {
+  const [theme, setTheme] = useContext(ThemeContext)
+  return [theme, setTheme]
+}
+
+function ChildComponent() {
+  const [theme] = useTheme()
+  return <div className={`theme-${theme}`}>Hello</div>
+}
+
+test('should change child component with theme', () => {
+  // define a wrapper function that takes children
+  // add type annotation for children
+  const wrapper = ({ children }: { children?: ReactNode }) => (
+    <ThemeProvider>{children}</ThemeProvider>
+  )
+
+  // render the hook with the wrapper
+  const { result } = renderHook(() => useTheme(), {
+    wrapper,
+  })
+
+  // get the theme and setTheme values from the hook
+  const [theme, setTheme] = result.current
+
+  // render the child component with the wrapper
+  render(<ChildComponent />, {
+    wrapper,
+  })
+
+  // check the initial className of the child component
+  expect(screen.getByText('Hello')).toHaveClass(`theme-${theme}`)
+
+  // change the theme by calling setTheme with a new value
+  // use act to wrap the call to setTheme
+  act(() => {
+    setTheme('light')
+  })
+
+  // update the child component with the new theme
+  render(<ChildComponent />, {
+    wrapper,
+  })
+
+  // check the updated className of the child component
+  expect(screen.getByText('Hello')).toHaveClass('theme-light')
+})
