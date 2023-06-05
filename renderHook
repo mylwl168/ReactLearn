@@ -3,6 +3,28 @@ import { render, screen } from '@testing-library/react'
 import { ThemeProvider, ThemeContext } from './theme-provider'
 import { ReactNode } from 'react'
 
+import React, { createContext, useState } from 'react'
+
+// create a context with a default value of 'dark'
+export const ThemeContext = createContext(['dark', () => {}])
+
+// create a provider component that uses the context
+export const ThemeProvider = ({ children }) => {
+  // use state to store the theme value
+  const [theme, setTheme] = useState('dark')
+
+  // return the provider component with the theme value and setter
+  return (
+    <ThemeContext.Provider value={[theme, setTheme]}>
+      {children}
+    </ThemeContext.Provider>
+  )
+}
+
+
+
+
+
 function useTheme() {
   const [theme, setTheme] = useContext(ThemeContext)
   return [theme, setTheme]
