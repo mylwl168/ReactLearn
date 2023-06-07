@@ -1,0 +1,14 @@
+var event = new KeyboardEvent("keydown", {
+  key: "a",
+  code: "KeyA",
+  location: KeyboardEvent.DOM_KEY_LOCATION_STANDARD,
+  ctrlKey: false,
+  altKey: false,
+  shiftKey: false,
+  metaKey: false,
+  bubbles: true,
+  cancelable: true
+});
+
+// 将事件对象发送给目标元素
+target.dispatchEvent(event);
