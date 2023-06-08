@@ -1,0 +1,50 @@
+import React, { useRef } from 'react';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
+
+const App = () => {
+  const gridRef = useRef(null);
+
+  const columns = [
+    { field: 'name', editable: true },
+    { field: 'age', editable: true },
+    { field: 'gender', editable: true },
+    { field: 'select', cellRenderer: (params) => '<select><option>Option 1</option><option>Option 2</option></select>' },
+  ];
+
+  const data = [
+    { name: 'Alice', age: 20, gender: 'female' },
+    { name: 'Bob', age: 25, gender: 'male' },
+    { name: 'Charlie', age: 30, gender: 'male' },
+    { name: 'David', age: 35, gender: 'male' },
+    { name: 'Eve', age: 40, gender: 'female' },
+  ];
+
+  const onCellFocused = (params) => {
+    // get the current focused cell
+    let currentCell = params.api.getFocusedCell();
+    // get the DOM element of the cell
+    let cellElement = params.api.getCellRendererInstances({rowIndex: currentCell.rowIndex, columnIds: [currentCell.column.colId]})[0].getGui();
+    // check if the cell contains a child tag
+    if (cellElement.childElementCount > 0) {
+      // get the first child tag
+      let firstChild = cellElement.querySelector('*');
+      // set focus to the first child tag
+      firstChild.focus();
+    }
+  };
+
+  return (
+    <div className="ag-theme-alpine" style={{ height: 400, width: 600 }}>
+      <AgGridReact
+        ref={gridRef}
+        columnDefs={columns}
+        rowData={data}
+        onCellFocused={onCellFocused}
+      />
+    </div>
+  );
+};
+
+export default App;
