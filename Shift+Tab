@@ -1,0 +1,80 @@
+var previousCell = gridOptions.api.navigateToNextCell('Shift+Tab', focusedCell.rowIndex, focusedCell.column);
+
+
+
+import React, { useRef } from 'react';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
+
+const App = () => {
+  const gridRef = useRef(null);
+
+  const columns = [
+    { field: 'name', editable: true },
+    { field: 'age', editable: true },
+    { field: 'gender', editable: true },
+  ];
+
+  const data = [
+    { name: 'Alice', age: 20, gender: 'female' },
+    { name: 'Bob', age: 25, gender: 'male' },
+    { name: 'Charlie', age: 30, gender: 'male' },
+    { name: 'David', age: 35, gender: 'male' },
+    { name: 'Eve', age: 40, gender: 'female' },
+  ];
+
+  const navigateToNextCell = (params) => {
+    var previousCell = params.previousCellPosition;
+    var suggestedNextCell = params.nextCellPosition;
+
+    var KEY_UP = 38;
+    var KEY_DOWN = 40;
+    var KEY_LEFT = 37;
+    var KEY_RIGHT = 39;
+    var KEY_TAB = 9;
+
+    switch (params.key) {
+      case KEY_DOWN:
+        previousCell = params.previousCellPosition;
+        // set selected cell on current cell + 1
+        gridRef.current.api.forEachNode(function (node) {
+          if (previousCell.rowIndex + 1 === node.rowIndex) {
+            node.setSelected(true);
+          }
+        });
+        return suggestedNextCell;
+      case KEY_UP:
+        previousCell = params.previousCellPosition;
+        // set selected cell on current cell - 1
+        gridRef.current.api.forEachNode(function (node) {
+          if (previousCell.rowIndex - 1 === node.rowIndex) {
+            node.setSelected(true);
+          }
+        });
+        return suggestedNextCell;
+      case KEY_LEFT:
+      case KEY_RIGHT:
+      case KEY_TAB:
+        return suggestedNextCell;
+      default:
+        throw new Error(
+          'this will never happen, navigation is always one of the 4 keys above'
+        );
+    }
+  };
+
+  return (
+    <div className="ag-theme-alpine" style={{ height: 400, width: 600 }}>
+      <AgGridReact
+        ref={gridRef}
+        columnDefs={columns}
+        rowData={data}
+        suppressKeyboardEvent={(params) => params.editing && params.event.keyCode === KEY_TAB}
+        navigateToNextCell={navigateToNextCell}
+      />
+    </div>
+  );
+};
+
+export default App;
