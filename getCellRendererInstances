@@ -1,0 +1,6 @@
+// get the current focused cell
+let currentCell = gridRef.current.api.getFocusedCell();
+// get the cell renderer instance of the focused cell
+let cellRenderer = gridRef.current.api.getCellRendererInstances({rowIndex: currentCell.rowIndex, columnIds: [currentCell.column.colId]})[0];
+// get the DOM element of the focused cell
+let cellElement = cellRenderer.getGui();
