@@ -1,0 +1,38 @@
+// 在父窗口中禁用用户交互和键盘事件
+function disableUserInteraction() {
+  document.body.style.pointerEvents = 'none';
+  document.body.style.userSelect = 'none'; // 禁止文本选择
+  document.body.style.overflow = 'hidden'; // 禁止滚动
+  document.addEventListener('keydown', preventDefaultEventHandler, true); // 捕获阶段监听所有键盘事件
+}
+
+// 在父窗口中恢复用户交互和键盘事件
+function enableUserInteraction() {
+  document.body.style.pointerEvents = 'auto';
+  document.body.style.userSelect = 'auto';
+  document.body.style.overflow = 'auto';
+  document.removeEventListener('keydown', preventDefaultEventHandler, true);
+}
+
+// 阻止键盘事件的默认行为
+function preventDefaultEventHandler(event: KeyboardEvent) {
+  event.preventDefault();
+}
+
+// 在父窗口中禁用用户交互和键盘事件
+disableUserInteraction();
+在这个示例中，我们添加了一个名为 preventDefaultEventHandler 的事件处理程序，它会捕获所有键盘事件，并调用 event.preventDefault() 来阻止它们的默认行为。
+
+在 disableUserInteraction 函数中，我们除了禁用用户交互的其他操作外，还通过 document.addEventListener 在捕获阶段监听所有键盘事件，并使用 preventDefaultEventHandler 来阻止它们的默认行为。
+
+在 enableUserInteraction 函数中，我们通过调用 document.removeEventListener 来移除键盘事件的监听器，从而恢复键盘事件的默认行为。
+
+请注意，这样做会禁用父窗口中的所有键盘事件，包括按键输入和快捷键。在恢复用户交互时，记得调用 enableUserInteraction 函数来启用键盘事件。
+
+希望这个示例对你有帮助。如果还有其他问题，请随时提问。
+
+
+
+
+
+
