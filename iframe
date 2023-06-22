@@ -1,0 +1,50 @@
+// 在父窗口中调用子窗口，并传递 PDF 数据的 URL
+const openChildWindow = (pdfUrl: string) => {
+  const childWindow = window.open('', '_blank');
+  
+  // 子窗口加载 HTML 页面
+  childWindow.document.write('<html><body><div id="pdfContainer"></div></body></html>');
+  childWindow.document.close();
+
+  // 获取子窗口的 DOM 元素
+  const pdfContainer = childWindow.document.getElementById('pdfContainer');
+
+  // 创建 iframe 元素
+  const iframe = document.createElement('iframe');
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+
+  // 监听 iframe 加载事件
+  iframe.addEventListener('load', () => {
+    const contentWindow = iframe.contentWindow;
+    if (contentWindow) {
+      // 在子窗口的 iframe 中加载 PDF
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', pdfUrl, true);
+      xhr.responseType = 'blob';
+
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const blob = xhr.response;
+
+          // 创建 URL 对象
+          const url = window.URL.createObjectURL(blob);
+
+          // 在 iframe 中显示 PDF
+          contentWindow.location.replace(url);
+
+          // 释放内存占用
+          window.URL.revokeObjectURL(url);
+        }
+      };
+
+      xhr.send();
+    }
+  });
+
+  // 将 iframe 添加到子窗口的容器中
+  pdfContainer.appendChild(iframe);
+};
+
+// 调用方法，传递 PDF 数据的 URL
+openChildWindow('http://example.com/path/to/pdf');
