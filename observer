@@ -1,0 +1,71 @@
+import React, { useContext, useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
+
+const IndicatorContext = React.createContext();
+
+function IndicatorProvider({ children }) {
+  const [isLoading, setLoading] = useContext(IndicatorContext);
+  const indicatorRef = useRef(null);
+
+  useEffect(() => {
+    const indicatorNode = ReactDOM.findDOMNode(indicatorRef.current);
+
+    if (isLoading) {
+      indicatorNode.style.display = 'block';
+    } else {
+      indicatorNode.style.display = 'none';
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      ReactDOM.flushSync(() => {
+        // 在这里进行同步更新
+        const indicatorNode = ReactDOM.findDOMNode(indicatorRef.current);
+
+        if (isLoading) {
+          indicatorNode.style.display = 'block';
+        } else {
+          indicatorNode.style.display = 'none';
+        }
+      });
+    });
+
+    observer.observe(indicatorRef.current, { attributes: true });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <IndicatorContext.Provider value={setLoading}>
+      {children}
+      <div ref={indicatorRef} className="indicator" />
+    </IndicatorContext.Provider>
+  );
+}
+
+function Indicator() {
+  return <div className="indicator" />;
+}
+
+function Page1() {
+  const setLoading = useContext(IndicatorContext);
+
+  setLoading(true);
+  heavyProcess();
+  setLoading(false);
+
+  return <div>Page1</div>;
+}
+
+function App() {
+  return (
+    <IndicatorProvider>
+      <Page1 />
+    </IndicatorProvider>
+  );
+}
+
+export default App;
