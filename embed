@@ -1,0 +1,23 @@
+// 获取 embed 元素
+var embedElement = document.getElementById('your-embed-id');
+
+// 检查 embed 元素是否加载完毕
+embedElement.addEventListener('load', function() {
+  // 获取嵌入的文档
+  var embeddedDocument = embedElement.contentDocument || embedElement.contentWindow.document;
+
+  // 通过嵌入文档的 DOM 操作获取特定元素
+  var buttonElement = embeddedDocument.getElementById('your-button-id');
+  var textBoxElement = embeddedDocument.getElementById('your-textbox-id');
+
+  // 执行相应的操作
+  if (buttonElement) {
+    // 操作按钮元素
+    console.log('找到按钮元素:', buttonElement);
+  }
+
+  if (textBoxElement) {
+    // 操作文本框元素
+    console.log('找到文本框元素:', textBoxElement);
+  }
+});
