@@ -1,0 +1,50 @@
+import React from 'react';
+import jsPDF from 'jspdf';
+import './font.css'; // 引入自定义字体CSS文件
+
+const generatePDF = () => {
+  // 创建一个新的jsPDF实例
+  const doc = new jsPDF();
+
+  // 设置字体为自定义字体
+  doc.setFont('CustomFont');
+
+  // 添加文本到PDF
+  doc.text('这是使用自定义字体的文本', 20, 20);
+
+  // 保存或输出PDF
+  doc.save('custom_font_example.pdf');
+};
+
+const App = () => {
+  return (
+    <div>
+      <button onClick={generatePDF}>生成PDF</button>
+    </div>
+  );
+};
+
+export default App;
+
+
+/* font.css */
+
+@font-face {
+  font-family: 'CustomFont';
+  src: url(data:application/x-font-ttf;base64,/* 这里粘贴前面生成的Base64编码字符串 */);
+  /* 可以添加其他字体相关的属性，比如font-weight和font-style等 */
+}
+
+
+
+const fs = require('fs');
+const path = require('path');
+
+// 读取字体文件
+const fontPath = path.join(__dirname, 'font.ttf');
+const fontBuffer = fs.readFileSync(fontPath);
+
+// 将字体文件转换为Base64编码
+const base64Font = fontBuffer.toString('base64');
+
+console.log(base64Font);
