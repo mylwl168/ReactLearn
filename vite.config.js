@@ -1,13 +1,13 @@
 // vite.config.js
 
 export default {
-  // 其他配置项...
+ // 他の設定項目...
   build: {
-    // 指定构建输出目录
+    // ビルドの出力先ディレクトリを指定します
     outDir: 'dist',
-    // 设置为 true，表示构建时生成类型声明文件
+    // ソースマップを生成するために true に設定します
     sourcemap: true,
-    // 设置为 false，避免在构建时输出冗余的类型声明文件
+    // false に設定して出力ディレクトリをビルド時に空にしないようにします
     emptyOutDir: false,
     lib: {
       entry: 'src/index.ts',
@@ -15,7 +15,7 @@ export default {
       fileName: 'your-library-name',
     },
     rollupOptions: {
-      // 指定输出 .d.ts 文件的目录
+      // .d.ts ファイルの出力先ディレクトリを指定します
       output: {
         dir: 'dist/types',
         entryFileNames: '[name].d.ts',
