@@ -1,0 +1,36 @@
+import React, { useState, useRef } from 'react';
+
+const ChildComponent: React.FC = () => {
+  const [inputValue, setInputValue] = useState('');
+  const timeoutRef = useRef<number | null>(null);
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.stopPropagation(); // 阻止事件传播
+    timeoutRef.current = window.setTimeout(() => {
+      // 假设这里是对 inputValue 的处理
+      const processedValue = inputValue.trim();
+      setInputValue(processedValue);
+
+      // 手动触发父组件的 onBlur 事件
+      const parentForm = e.currentTarget.closest('form');
+      if (parentForm) {
+        const event = new FocusEvent('blur', {
+          bubbles: true,
+          cancelable: true,
+          relatedTarget: e.relatedTarget,
+        });
+        parentForm.dispatchEvent(event);
+      }
+    }, 1000); // 例如 1 秒延迟
+  };
+
+  return (
+    <input
+      value={inputValue}
+      onChange={(e) => setInputValue(e.target.value)}
+      onBlur={handleBlur}
+    />
+  );
+};
+
+export default ChildComponent;
