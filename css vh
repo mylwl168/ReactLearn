@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simplified Container</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
+    .outer-container {
+      width: 90vw;
+      height: 90vh;
+      background-color: lightblue;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .inner-container {
+      width: 90%;
+      height: 90%;
+      background-color: lightgreen;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <div class="outer-container">
+    <div class="inner-container">
+      这是一个内部的div，它是外部container的90%大小。
+    </div>
+  </div>
+</body>
+</html>
