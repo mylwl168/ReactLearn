@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Input Keydown Event</title>
+</head>
+<body>
+  <input type="text" id="myInput" placeholder="Type something...">
+
+  <script>
+    // 获取输入框的元素
+    const inputElement = document.getElementById('myInput');
+
+    // 添加keydown事件监听器
+    inputElement.addEventListener('keydown', function(event) {
+      console.log('Key pressed:', event.key);
+    });
+  </script>
+</body>
+</html>
