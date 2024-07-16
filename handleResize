@@ -1,34 +1,47 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 
 const App: React.FC = () => {
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const outerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [calculatedHeight, setCalculatedHeight] = useState<number>(0);
 
   useEffect(() => {
     const handleResize = () => {
-      const windowWidth = window.innerWidth;
-      const windowHeight = window.innerHeight;
-      setDimensions({
-        width: windowWidth * 0.9,
-        height: windowHeight * 0.9 - 60, // Example calculation
-      });
+      if (contentRef.current) {
+        const contentHeight = contentRef.current.scrollHeight;
+        const windowHeight = window.innerHeight;
+        setCalculatedHeight(contentHeight > 300 ? windowHeight * 0.9 : contentHeight);
+      }
     };
 
-    handleResize(); // Set initial dimensions
+    handleResize(); // Set initial height
     window.addEventListener('resize', handleResize);
 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return (
-    <div className="outer-container">
-      <div className="inner-container" style={{ width: `${dimensions.width}px`, height: `${dimensions.height}px` }}>
-        <p>
-          这是一个内部的div，它的高度会自动计算，但不会超过外部容器的90%。超出部分不会显示省略号。这里是一些示例文本，用来演示效果。这个文本会根据内部容器的宽度和最大高度自动调整。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。
-        </p>
+    <div ref={outerRef} className="outer-container">
+      <div
+        className="inner-container"
+        style={{ maxHeight: `${calculatedHeight}px` }}
+        ref={contentRef}
+      >
+        <CustomComponent className="custom-component">
+          <p>
+            这是一个内部的div，它的高度会自动计算，但不会超过300px。如果高度超过300px，则会根据窗口高度来设置。超出部分不会显示省略号。这里是一些示例文本，用来演示效果。这个文本会根据内部容器的宽度和最大高度自动调整。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。
+          </p>
+        </CustomComponent>
       </div>
     </div>
   );
 };
 
 export default App;
+
+const CustomComponent: React.FC<{ className: string }> = ({ className, children }) => (
+  <div className={className}>
+    {children}
+  </div>
+);
