@@ -1,30 +1,30 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 
 const App: React.FC = () => {
-  const outerRef = useRef<HTMLDivElement>(null);
-  const [innerHeight, setInnerHeight] = useState<number>(0);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     const handleResize = () => {
-      if (outerRef.current) {
-        const outerHeight = outerRef.current.clientHeight;
-        const calculatedHeight = outerHeight * 0.9 - 60; // Example calculation
-        setInnerHeight(calculatedHeight);
-      }
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      setDimensions({
+        width: windowWidth * 0.9,
+        height: windowHeight * 0.9 - 60, // Example calculation
+      });
     };
 
-    handleResize(); // Set initial height
+    handleResize(); // Set initial dimensions
     window.addEventListener('resize', handleResize);
 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return (
-    <div ref={outerRef} className="outer-container">
-      <div className="inner-container" style={{ maxHeight: `${innerHeight}px` }}>
+    <div className="outer-container">
+      <div className="inner-container" style={{ width: `${dimensions.width}px`, height: `${dimensions.height}px` }}>
         <p>
-          这是一个内部的div，它的高度会自动计算，但不会超过外部容器的90%。超出部分不会显示省略号。这里是一些示例文本，用来演示效果。这个文本会根据内部容器的宽度和最大高度自动调整。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。
+          这是一个内部的div，它的高度会自动计算，但不会超过外部容器的90%。超出部分不会显示省略号。这里是一些示例文本，用来演示效果。这个文本会根据内部容器的宽度和最大高度自动调整。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。再多加一些文本，以便演示更多行的情况。
         </p>
       </div>
     </div>
