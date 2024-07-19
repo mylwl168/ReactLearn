@@ -133,3 +133,71 @@ adjustSize();
   align-items: center; /* 默认纵向居中对齐 */
 }
 
+
+---
+
+/* a的样式 */
+#a {
+  display: flex;
+  flex-direction: column;
+  max-width: 80vw;
+  max-height: 70vh;
+  min-width: 300px;
+  min-height: 200px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+}
+
+/* d的样式 (header) */
+#d {
+  padding: 10px;
+  background: #ddd;
+  text-align: center;
+}
+
+/* 第二行的样式 */
+.content {
+  display: flex;
+  flex: 1; /* 让第二行占据剩余空间 */
+  overflow: hidden; /* 隐藏默认滚动条 */
+}
+
+/* b和c的样式 */
+#b {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+#c {
+  flex: 1; /* 让c占据剩余空间 */
+  padding: 10px;
+  overflow-y: auto; /* 只在c中显示滚动条 */
+  word-wrap: break-word; /* 保证长文本自动换行 */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 默认垂直居中对齐 */
+}
+
+/* 使用:before伪元素检测内容高度 */
+#c:before {
+  content: '';
+  display: block;
+  height: 100%;
+  overflow: hidden;
+}
+
+#c > * {
+  display: inline-block;
+}
+
+#c:before:empty + * {
+  align-self: center;
+}
+
+#c:before:not(:empty) + * {
+  align-self: flex-start;
+}
+
+
