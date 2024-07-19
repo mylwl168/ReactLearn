@@ -32,38 +32,21 @@
   padding: 10px;
 }
 
-.c {
-  flex: 1; /* 让.c占据剩余空间 */
+/* f的样式，用于居中 */
+.f {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
   padding: 10px;
+}
+
+/* c的样式，用于显示滚动条 */
+.c {
+  max-height: 100%; /* 防止内容溢出 */
   overflow-y: auto; /* 只在.c中显示滚动条 */
   word-wrap: break-word; /* 保证长文本自动换行 */
-  display: flex;
-  align-items: center;
-  justify-content: center; /* 默认垂直居中对齐 */
-  position: relative;
 }
-
-.c:before {
-  content: '';
-  display: block;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
-.c > * {
-  margin: auto; /* 垂直居中 */
-  max-height: 100%; /* 防止内容溢出 */
-  overflow: auto; /* 启用滚动 */
-}
-
-.c:empty:before {
-  display: none;
-}
-
 
 
 <!DOCTYPE html>
@@ -85,13 +68,14 @@
         <!-- icon -->
         <img src="icon.png" alt="icon" />
       </div>
-      <div class="c">
-        <!-- 文字内容 -->
-        这里是一些文字内容。根据内容的多少，a的尺寸会自动调整。
-        这里是一些文字内容。根据内容的多少，a的尺寸会自动调整。
+      <div class="f">
+        <div class="c">
+          <!-- 文字内容 -->
+          这里是一些文字内容。根据内容的多少，a的尺寸会自动调整。
+          这里是一些文字内容。根据内容的多少，a的尺寸会自动调整。
+        </div>
       </div>
     </div>
   </div>
 </body>
 </html>
-
