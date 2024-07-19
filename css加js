@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Div</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="a">
+    <div id="d">
+      <!-- header内容 -->
+      Header
+    </div>
+    <div class="content">
+      <div id="b">
+        <!-- icon -->
+        <img src="icon.png" alt="icon" />
+      </div>
+      <div id="c">
+        <!-- 文字内容 -->
+        这里是一些文字内容。根据内容的多少，a的尺寸会自动调整。
+        这里是一些文字内容。根据内容的多少，a的尺寸会自动调整。
+        这里是一些文字内容。根据内容的多少，a的尺寸会自动调整。
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+/* styles.css */
+#a {
+  display: flex;
+  flex-direction: column;
+  max-width: 80vw;
+  max-height: 70vh;
+  min-width: 300px;
+  min-height: 200px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+}
+
+#d {
+  padding: 10px;
+  background: #ddd;
+  text-align: center;
+}
+
+.content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+#b {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+#c {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  word-wrap: break-word;
+}
+
+
+// script.js
+window.addEventListener('resize', adjustSize);
+
+function adjustSize() {
+  const a = document.getElementById('a');
+  
+  const maxWidth = Math.min(window.innerWidth * 0.8, 600);
+  const maxHeight = Math.min(window.innerHeight * 0.7, 400);
+
+  a.style.maxWidth = maxWidth + 'px';
+  a.style.maxHeight = maxHeight + 'px';
+  a.style.minWidth = '300px';
+  a.style.minHeight = '200px';
+}
+
+adjustSize();
