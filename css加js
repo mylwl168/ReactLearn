@@ -1,95 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Responsive Div</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div id="a">
-    <div id="d">
-      <!-- header内容 -->
-      Header
-    </div>
-    <div class="content">
-      <div id="b">
-        <!-- icon -->
-        <img src="icon.png" alt="icon" />
-      </div>
-      <div id="c">
-        <!-- 文字内容 -->
-        这里是一些文字内容。根据内容的多少，a的尺寸会自动调整。
-        这里是一些文字内容。根据内容的多少，a的尺寸会自动调整。
-        这里是一些文字内容。根据内容的多少，a的尺寸会自动调整。
-      </div>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
-</body>
-</html>
-
-
-/* styles.css */
-#a {
-  display: flex;
-  flex-direction: column;
-  max-width: 80vw;
-  max-height: 70vh;
-  min-width: 300px;
-  min-height: 200px;
-  border: 1px solid #ccc;
-  background: #f9f9f9;
-}
-
-#d {
-  padding: 10px;
-  background: #ddd;
-  text-align: center;
-}
-
-.content {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
-
-#b {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-}
-
-#c {
-  flex: 1;
-  padding: 10px;
-  overflow-y: auto;
-  word-wrap: break-word;
-}
-
-
-// script.js
-window.addEventListener('resize', adjustSize);
-
-function adjustSize() {
-  const a = document.getElementById('a');
-  
-  const maxWidth = Math.min(window.innerWidth * 0.8, 600);
-  const maxHeight = Math.min(window.innerHeight * 0.7, 400);
-
-  a.style.maxWidth = maxWidth + 'px';
-  a.style.maxHeight = maxHeight + 'px';
-  a.style.minWidth = '300px';
-  a.style.minHeight = '200px';
-}
-
-adjustSize();
-
-
---------
-
 /* a的样式 */
 #a {
   display: flex;
@@ -124,84 +32,39 @@ adjustSize();
   padding: 10px;
 }
 
-#c {
-  flex: 1; /* 让c占据剩余空间 */
+.c {
+  flex: 1; /* 让.c占据剩余空间 */
   padding: 10px;
-  overflow-y: auto; /* 只在c中显示滚动条 */
-  word-wrap: break-word; /* 保证长文本自动换行 */
-  display: flex;
-  align-items: center; /* 默认纵向居中对齐 */
-}
-
-
----
-
-/* a的样式 */
-#a {
-  display: flex;
-  flex-direction: column;
-  max-width: 80vw;
-  max-height: 70vh;
-  min-width: 300px;
-  min-height: 200px;
-  border: 1px solid #ccc;
-  background: #f9f9f9;
-}
-
-/* d的样式 (header) */
-#d {
-  padding: 10px;
-  background: #ddd;
-  text-align: center;
-}
-
-/* 第二行的样式 */
-.content {
-  display: flex;
-  flex: 1; /* 让第二行占据剩余空间 */
-  overflow: hidden; /* 隐藏默认滚动条 */
-}
-
-/* b和c的样式 */
-#b {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-}
-
-#c {
-  flex: 1; /* 让c占据剩余空间 */
-  padding: 10px;
-  overflow-y: auto; /* 只在c中显示滚动条 */
+  overflow-y: auto; /* 只在.c中显示滚动条 */
   word-wrap: break-word; /* 保证长文本自动换行 */
   display: flex;
   align-items: center;
   justify-content: center; /* 默认垂直居中对齐 */
+  position: relative;
 }
 
-/* 使用:before伪元素检测内容高度 */
-#c:before {
+.c:before {
   content: '';
   display: block;
   height: 100%;
-  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
-#c > * {
-  display: inline-block;
+.c > * {
+  margin: auto; /* 垂直居中 */
+  max-height: 100%; /* 防止内容溢出 */
+  overflow: auto; /* 启用滚动 */
 }
 
-#c:before:empty + * {
-  align-self: center;
-}
-
-#c:before:not(:empty) + * {
-  align-self: flex-start;
+.c:empty:before {
+  display: none;
 }
 
 
-----
 
 <!DOCTYPE html>
 <html lang="en">
@@ -222,7 +85,7 @@ adjustSize();
         <!-- icon -->
         <img src="icon.png" alt="icon" />
       </div>
-      <div id="c">
+      <div class="c">
         <!-- 文字内容 -->
         这里是一些文字内容。根据内容的多少，a的尺寸会自动调整。
         这里是一些文字内容。根据内容的多少，a的尺寸会自动调整。
@@ -231,5 +94,4 @@ adjustSize();
   </div>
 </body>
 </html>
-
 
