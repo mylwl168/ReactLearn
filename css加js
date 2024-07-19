@@ -201,3 +201,35 @@ adjustSize();
 }
 
 
+----
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Div</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="a">
+    <div id="d">
+      <!-- header内容 -->
+      Header
+    </div>
+    <div class="content">
+      <div id="b">
+        <!-- icon -->
+        <img src="icon.png" alt="icon" />
+      </div>
+      <div id="c">
+        <!-- 文字内容 -->
+        这里是一些文字内容。根据内容的多少，a的尺寸会自动调整。
+        这里是一些文字内容。根据内容的多少，a的尺寸会自动调整。
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+
