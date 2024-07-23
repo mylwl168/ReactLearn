@@ -1,21 +1,12 @@
 #!/bin/bash
 
-# 关键字
-keyword="你的关键字"
-
 # 获取所有分支
-branches=$(git for-each-ref --format='%(refname:short)' refs/heads/ refs/remotes/)
+branches=$(git for-each-ref --format='%(refname:short)' refs/heads/ refs/remotes/origin/)
 
 # 遍历每个分支
 for branch in $branches; do
-    echo "Searching in branch: $branch"
-    # 获取分支中的所有提交
-    commits=$(git rev-list --all --remotes --branches -- "$branch")
-
-    # 遍历每个提交
-    for commit in $commits; do
-        echo "Checking commit: $commit"
-        # 检查提交中的文件内容
-        git grep -F "$keyword" $commit
-    done
+    branch_name=$(basename "$branch")
+    echo "Checking out branch: $branch_name"
+    mkdir -p "../$branch_name"
+    git worktree add "../$branch_name" "$branch"
 done
