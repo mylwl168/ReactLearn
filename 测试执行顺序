@@ -1,0 +1,23 @@
+import React, { useEffect } from 'react';
+
+const ExampleComponent = () => {
+  useEffect(() => {
+    console.log('useEffect callback');
+  }, []);
+
+  useEffect(() => {
+    const observer = new MutationObserver((mutationsList) => {
+      for (const mutation of mutationsList) {
+        console.log('MutationObserver callback');
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return <div>Example</div>;
+};
+
+export default ExampleComponent;
