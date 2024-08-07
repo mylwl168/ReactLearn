@@ -20,4 +20,111 @@ const ExampleComponent = () => {
   return <div>Example</div>;
 };
 
+export default 在JavaScript中，任务的调度由事件循环（event loop）管理，事件循环区分了宏任务（macro-tasks）和微任务（micro-tasks）。理解这一点有助于解释`useEffect`和`MutationObserver`的执行顺序。
+
+### 事件循环与任务调度
+
+1. **宏任务（macro-tasks）**:
+    - 示例：`setTimeout`、`setInterval`、`setImmediate`、I/O操作、事件回调等。
+    - 宏任务队列中的任务会依次执行，每执行完一个宏任务，都会清空微任务队列中的所有任务。
+
+2. **微任务（micro-tasks）**:
+    - 示例：`Promise.then`、`MutationObserver`、`queueMicrotask`等。
+    - 微任务会在当前宏任务执行完之后立即执行，且在下一个宏任务开始之前执行。
+
+### `useEffect`和`MutationObserver`的执行顺序
+
+在React中，`useEffect`的回调函数会在DOM更新完成后执行。这个过程被安排在一个新的宏任务中。因此，`useEffect`的执行时间取决于当前宏任务的完成时间。
+
+另一方面，`MutationObserver`的回调函数是作为微任务来执行的。因此，当DOM发生变化时，`MutationObserver`的回调函数会在当前宏任务结束后立即执行。
+
+### 实际执行顺序的影响因素
+
+- **渲染时机**：React的渲染过程本身是一个宏任务。如果在渲染过程中触发了`MutationObserver`，那么其回调会在当前渲染的宏任务完成之后立即执行。
+- **任务队列的状态**：由于`useEffect`的回调函数是在渲染完成后安排的一个新的宏任务，而`MutationObserver`是一个微任务，所以当两者几乎同时触发时，`MutationObserver`的回调函数通常会先执行。
+
+然而，由于浏览器的任务调度和优化机制，有时可能会观察到`useEffect`先执行。这种情况可能取决于具体的浏览器实现和当前的任务队列状态。
+
+### 具体例子
+
+```jsx
+import React, { useEffect } from 'react';
+
+const ExampleComponent = () => {
+  useEffect(() => {
+    console.log('useEffect callback');
+  }, []);
+
+  useEffect(() => {
+    const observer = new MutationObserver((mutationsList) => {
+      for (const mutation of mutationsList) {
+        console.log('MutationObserver callback');
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return <div>Example</div>;
+};
+
 export default ExampleComponent;
+```
+
+在这个例子中，当DOM发生在JavaScript中，任务的调度由事件循环（event loop）管理，事件循环区分了宏任务（macro-tasks）和微任务（micro-tasks）。理解这一点有助于解释useEffect和MutationObserver的执行顺序。
+
+事件循环与任务调度
+
+	1.	宏任务（macro-tasks）:
+	•	示例：setTimeout、setInterval、setImmediate、I/O操作、事件回调等。
+	•	宏任务队列中的任务会依次执行，每执行完一个宏任务，都会清空微任务队列中的所有任务。
+	2.	微任务（micro-tasks）:
+	•	示例：Promise.then、MutationObserver、queueMicrotask等。
+	•	微任务会在当前宏任务执行完之后立即执行，且在下一个宏任务开始之前执行。
+
+useEffect和MutationObserver的执行顺序
+
+在React中，useEffect的回调函数会在DOM更新完成后执行。这个过程被安排在一个新的宏任务中。因此，useEffect的执行时间取决于当前宏任务的完成时间。
+
+另一方面，MutationObserver的回调函数是作为微任务来执行的。因此，当DOM发生变化时，MutationObserver的回调函数会在当前宏任务结束后立即执行。
+
+实际执行顺序的影响因素
+
+	•	渲染时机：React的渲染过程本身是一个宏任务。如果在渲染过程中触发了MutationObserver，那么其回调会在当前渲染的宏任务完成之后立即执行。
+	•	任务队列的状态：由于useEffect的回调函数是在渲染完成后安排的一个新的宏任务，而MutationObserver是一个微任务，所以当两者几乎同时触发时，MutationObserver的回调函数通常会先执行。
+
+然而，由于浏览器的任务调度和优化机制，有时可能会观察到useEffect先执行。这种情况可能取决于具体的浏览器实现和当前的任务队列状态。
+
+具体例子
+
+import React, { useEffect } from 'react';
+
+const ExampleComponent = () => {
+  useEffect(() => {
+    console.log('useEffect callback');
+  }, []);
+
+  useEffect(() => {
+    const observer = new MutationObserver((mutationsList) => {
+      for (const mutation of mutationsList) {
+        console.log('MutationObserver callback');
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return <div>Example</div>;
+};
+
+export default ExampleComponent;
+
+在这个例子中，当DOM发生变化时，MutationObserver的回调函数会作为微任务执行。而useEffect的回调函数会在当前渲染完成后，作为一个新的宏任务执行。因此，通常情况下，你会先看到“MutationObserver callback”，然后是“useEffect callback”。
+
+如果你在Edge中测试，发现有时useEffect先执行，有时MutationObserver先执行，这种行为可能是由于Edge浏览器的任务调度机制或者当前的任务队列状态造成的。这种不确定性在一些复杂的渲染和任务调度场景中是可能发生的。时，`MutationObserver`的回调函数会作为微任务执行。而`useEffect`的回调函数会在当前渲染完成后，作为一个新的宏任务执行。因此，通常情况下，你会先看到“MutationObserver callback”，然后是“useEffect callback”。
+
+如果你在Edge中测试，发现有时`useEffect`先执行，有时`MutationObserver`先执行，这种行为可能是由于Edge浏览器的任务调度机制或者当前的任务队列状态造成的。这种不确定性在一些复杂的渲染和任务调度场景中是可能发生的。
