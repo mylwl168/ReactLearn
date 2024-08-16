@@ -20,3 +20,39 @@ async function globalTeardown(config: FullConfig) {
 }
 
 export default { globalSetup, globalTeardown };
+
+
+
+
+
+
+import { test, expect } from '@playwright/test';
+import { spawn, ChildProcess } from 'child_process';
+
+let serverProcess: ChildProcess | null = null;
+
+test.beforeEach(async () => {
+  console.log('Starting React app...');
+  serverProcess = spawn('npm', ['run', 'dev'], {
+    stdio: 'inherit',
+    shell: true,  // 在 Windows 上需要设置 shell 为 true
+  });
+
+  // 等待开发服务器启动（可根据实际需要调整时间）
+  await new Promise((resolve) => setTimeout(resolve, 10000));
+});
+
+test.afterEach(async () => {
+  if (serverProcess) {
+    console.log('Stopping React app...');
+    serverProcess.kill();
+  }
+});
+
+test('basic test', async ({ page }) => {
+  await page.goto('http://localhost:3000'); // 或者使用相对路径 await page.goto('/')
+  await expect(page).toHaveTitle(/React App/);
+
+  // 继续添加你的测试逻辑...
+});
+
