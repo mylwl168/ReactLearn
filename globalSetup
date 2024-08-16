@@ -1,0 +1,22 @@
+import { FullConfig } from '@playwright/test';
+import { spawn } from 'child_process';
+
+let serverProcess: ReturnType<typeof spawn> | null = null;
+
+async function globalSetup(config: FullConfig) {
+  serverProcess = spawn('npm', ['run', 'dev'], {
+    stdio: 'inherit',
+    shell: true, // Windows 下需要设置 shell 为 true
+  });
+
+  // 等待服务启动
+  await new Promise((resolve) => setTimeout(resolve, 5000)); // 适当延时，确保服务启动
+}
+
+async function globalTeardown(config: FullConfig) {
+  if (serverProcess) {
+    serverProcess.kill();
+  }
+}
+
+export default { globalSetup, globalTeardown };
