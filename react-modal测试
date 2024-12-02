@@ -24,6 +24,18 @@ const App = () => {
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
         ariaHideApp={false} // 防止警告，用于非严格模式开发
+        style={{
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0)', // 设置透明背景
+            pointerEvents: 'none', // 让背景可交互
+          },
+          content: {
+            pointerEvents: 'auto', // 只允许 Modal 内容交互
+            width: '300px',
+            height: '200px',
+            margin: 'auto',
+          },
+        }}
       >
         <h2>Modal Content</h2>
         <button onClick={() => setIsModalOpen(false)}>Close Modal</button>
