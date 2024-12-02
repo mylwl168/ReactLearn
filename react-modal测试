@@ -1,0 +1,35 @@
+import React from 'react';
+import Modal from 'react-modal';
+
+const App = () => {
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [backgroundInputValue, setBackgroundInputValue] = React.useState('');
+
+  return (
+    <div>
+      {/* 背景页面内容 */}
+      <label>
+        Background Input:
+        <input
+          type="text"
+          value={backgroundInputValue}
+          onChange={(e) => setBackgroundInputValue(e.target.value)}
+        />
+      </label>
+
+      <button onClick={() => setIsModalOpen(true)}>Open Modal</button>
+
+      {/* React-Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        ariaHideApp={false} // 防止警告，用于非严格模式开发
+      >
+        <h2>Modal Content</h2>
+        <button onClick={() => setIsModalOpen(false)}>Close Modal</button>
+      </Modal>
+    </div>
+  );
+};
+
+export default App;
