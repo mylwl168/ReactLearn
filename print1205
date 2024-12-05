@@ -19,3 +19,30 @@
       document.body.removeEventListener('focusin', handleFocusIn);
     };
   }, []);
+
+
+------
+
+
+  useEffect(() => {
+    const handleFocusOut = (event: FocusEvent) => {
+      const nextFocusElement = event.relatedTarget as HTMLElement | null;
+
+      // 如果焦点转移到 body、html 或 null，则强制将焦点返回到 input
+      if (
+        !nextFocusElement || 
+        nextFocusElement.tagName === 'BODY' || 
+        nextFocusElement.tagName === 'HTML'
+      ) {
+        console.log('Focus prevented. Returning to input.');
+        inputRef.current?.focus();
+      }
+    };
+
+    // 监听全局 focusout 事件
+    document.addEventListener('focusout', handleFocusOut);
+
+    return () => {
+      document.removeEventListener('focusout', handleFocusOut);
+    };
+  }, []);
