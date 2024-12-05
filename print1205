@@ -46,3 +46,104 @@
       document.removeEventListener('focusout', handleFocusOut);
     };
   }, []);
+
+
+
+---
+
+
+
+
+1. 阻止焦点丢失
+通过监听 blur 和 focusout 事件，可以阻止焦点从 input 转移，从而避免输入法状态被确定。
+
+tsx
+コードをコピーする
+import React, { useEffect, useRef } from 'react';
+
+const App: React.FC = () => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const handleFocusOut = (event: FocusEvent) => {
+      // 阻止输入框失去焦点
+      event.preventDefault();
+      inputRef.current?.focus();
+    };
+
+    inputRef.current?.addEventListener('blur', handleFocusOut);
+
+    return () => {
+      inputRef.current?.removeEventListener('blur', handleFocusOut);
+    };
+  }, []);
+
+  return (
+    <div>
+      <h1>IME Input Retention</h1>
+      <input ref={inputRef} type="text" placeholder="Type something with IME" />
+    </div>
+  );
+};
+
+export default App;
+原理：
+捕获输入框的 blur 或 focusout 事件并阻止其默认行为。
+强制将焦点重新设置到 input。
+2. 禁用非输入区域的点击行为
+监听页面上的点击事件，当用户点击 body 或其他非输入区域时，阻止默认的焦点转移。
+
+tsx
+コードをコピーする
+useEffect(() => {
+  const preventFocusLoss = (event: MouseEvent) => {
+    if (event.target instanceof HTMLElement && event.target.tagName !== 'INPUT') {
+      event.preventDefault();
+      inputRef.current?.focus();
+    }
+  };
+
+  document.addEventListener('mousedown', preventFocusLoss);
+
+  return () => {
+    document.removeEventListener('mousedown', preventFocusLoss);
+  };
+}, []);
+原理：
+当用户点击非输入框区域时，强制保持输入框的焦点。
+3. 使用 compositionstart 和 compositionend 事件检测 IME 状态
+浏览器支持 compositionstart 和 compositionend 事件，可以监听这些事件并在输入法未完成时提供提示或强制返回焦点。
+
+tsx
+コードをコピーする
+useEffect(() => {
+  let isComposing = false;
+
+  const handleCompositionStart = () => {
+    isComposing = true;
+    console.log('Composition started');
+  };
+
+  const handleCompositionEnd = () => {
+    isComposing = false;
+    console.log('Composition ended');
+  };
+
+  const handleFocusOut = (event: FocusEvent) => {
+    if (isComposing) {
+      event.preventDefault();
+      inputRef.current?.focus();
+    }
+  };
+
+  const input = inputRef.current;
+  input?.addEventListener('compositionstart', handleCompositionStart);
+  input?.addEventListener('compositionend', handleCompositionEnd);
+  input?.addEventListener('blur', handleFocusOut);
+
+  return () => {
+    input?.removeEventListener('compositionstart', handleCompositionStart);
+    input?.removeEventListener('compositionend', handleCompositionEnd);
+    input?.removeEventListener('blur', handleFocusOut);
+  };
+}, []);
