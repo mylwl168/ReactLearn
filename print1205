@@ -1,0 +1,21 @@
+  useEffect(() => {
+    const handleFocusIn = (event: FocusEvent) => {
+      const targetElement = event.target as HTMLElement;
+      console.log(`Focus started on: ${targetElement.tagName}`);
+
+      // 打印冒泡链条上的所有元素
+      let currentElement: HTMLElement | null = targetElement;
+      console.log('Bubble chain:');
+      while (currentElement) {
+        console.log(currentElement.tagName);
+        currentElement = currentElement.parentElement; // 移动到父节点
+      }
+    };
+
+    // 监听 body 上的 focusin 事件
+    document.body.addEventListener('focusin', handleFocusIn);
+
+    return () => {
+      document.body.removeEventListener('focusin', handleFocusIn);
+    };
+  }, []);
