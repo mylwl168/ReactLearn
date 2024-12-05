@@ -1,13 +1,13 @@
   useEffect(() => {
     const handleFocusIn = (event: FocusEvent) => {
       const targetElement = event.target as HTMLElement;
-      console.log(`Focus started on: ${targetElement.tagName}`);
+      console.log(`Focus started on: <${targetElement.tagName.toLowerCase()} class="${targetElement.className}">`);
 
-      // 打印冒泡链条上的所有元素
+      // 打印冒泡链条上的所有元素及其类名
       let currentElement: HTMLElement | null = targetElement;
       console.log('Bubble chain:');
       while (currentElement) {
-        console.log(currentElement.tagName);
+        console.log(`<${currentElement.tagName.toLowerCase()} class="${currentElement.className}">`);
         currentElement = currentElement.parentElement; // 移动到父节点
       }
     };
