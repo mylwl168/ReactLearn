@@ -147,3 +147,22 @@ useEffect(() => {
     input?.removeEventListener('blur', handleFocusOut);
   };
 }, []);
+
+
+
+-----
+
+
+useEffect(() => {
+  const preventInteraction = (event: MouseEvent | KeyboardEvent) => {
+    event.preventDefault();
+  };
+
+  document.addEventListener('mousedown', preventInteraction);
+  document.addEventListener('keydown', preventInteraction);
+
+  return () => {
+    document.removeEventListener('mousedown', preventInteraction);
+    document.removeEventListener('keydown', preventInteraction);
+  };
+}, []);
