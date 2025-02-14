@@ -5,7 +5,7 @@ import { Bar } from "react-chartjs-2";
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Title);
 
 const data = {
-  labels: ["A", "Long Label B", "C", "D", "Very Long Label E"],
+  labels: ["A", "B", "C", "D", "E"],
   datasets: [
     {
       label: "Dataset 1",
@@ -23,10 +23,9 @@ const options = {
   scales: {
     x: {
       ticks: {
-        color: "black",
-        callback: function (value: any) {
-          // 模拟换行（实际可以用CSS控制更精准）
-          return String(value).split(" ");
+        color: "black", // 文字颜色黑色
+        font: {
+          weight: "bold",
         },
       },
     },
@@ -35,44 +34,4 @@ const options = {
 
 const BlackBoxPlugin = {
   id: "blackBox",
-  beforeDraw: (chart: any) => {
-    const ctx = chart.ctx;
-    const xAxis = chart.scales.x;
-    if (!xAxis) return;
-
-    let prevRightEdge = xAxis.left; // 记录上一个框的右边缘
-    const padding = 5; // 文字边距
-
-    xAxis.ticks.forEach((tick: any, index: number) => {
-      const x = xAxis.getPixelForTick(index);
-      const text = tick.label;
-      const textLines = String(text).split(" "); // 计算行数
-      const textHeight = 14 * textLines.length; // 14px 为字体大小，每行加高度
-
-      const textWidth = Math.max(...textLines.map((line) => ctx.measureText(line).width)); // 获取最长一行的宽度
-      const leftEdge = Math.max(prevRightEdge, x - textWidth / 2 - padding); // 保证左边缘不重叠
-      const rightEdge = leftEdge + textWidth + padding * 2;
-      prevRightEdge = rightEdge; // 记录当前框的右边缘
-
-      const y = xAxis.top + 2; // X 轴稍微留点距离
-
-      ctx.fillStyle = "black";
-      ctx.fillRect(leftEdge, y, rightEdge - leftEdge, textHeight + padding * 2);
-
-      ctx.fillStyle = "white";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "top";
-
-      // 逐行绘制文本
-      textLines.forEach((line, i) => {
-        ctx.fillText(line, leftEdge + (rightEdge - leftEdge) / 2, y + padding + i * 14);
-      });
-    });
-  },
-};
-
-const BarChart = () => {
-  return <Bar data={data} options={options} plugins={[BlackBoxPlugin]} />;
-};
-
-export default BarChart;
+  beforeDraw: (chart: any) =>
