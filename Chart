@@ -1,78 +1,38 @@
-const options = {
-  scales: {
-    x: {
-      ticks: {
-        callback: function (value, index, ticks) {
-          return this.getLabelForValue(value).split("\n"); // 自动换行
-        },
-      },
-      labels: [
-        ["Line 1", "Line 2"], // 第一组 Label
-        ["A", "B"], // 第二组 Label
-        ["Row 1", "Row 2"], // 第三组 Label
-      ],
-    },
-  },
-};
-
-
-
 const BlackBoxPlugin = {
   id: "blackBox",
-  beforeDraw: (chart: any) => {
-    const ctx = chart.ctx;
-    const xAxis = chart.scales.x;
-    if (!xAxis) return;
+  beforeDraw: (chart: Chart) => {
+    const { ctx, scales: { x }, chartArea } = chart;
+    
+    // 🎯 X軸のラベルエリアの高さを決定
+    const boxHeight = 20; // すべてのラベルに統一の高さを設定
+    const yBottom = x.bottom + boxHeight; // X軸の下にボックスを配置
 
-    const padding = 12; // 额外增加的高度
-    let maxLabelHeight = 0;
+    ctx.save(); // 🎯 現在の描画状態を保存
 
-    // 计算所有 label 的最大高度
-    xAxis.ticks.forEach((tick: any) => {
-      const textMetrics = ctx.measureText(tick.label);
-      const textHeight = Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxDescent);
-      maxLabelHeight = Math.max(maxLabelHeight, textHeight);
+    // 🎯 各ラベルの下に黒いボックスを描画
+    x.ticks.forEach((tick, index) => {
+      const xLeft = x.getPixelForTick(index); // 現在のラベルのX座標
+      const xRight = index < x.ticks.length - 1 
+        ? x.getPixelForTick(index + 1) 
+        : chartArea.right; // 最後のラベルは右端まで広げる
+
+      // 🔳 黒いボックスの描画（透明な背景 + 黒い枠線）
+      ctx.fillStyle = "transparent"; // 内部は透明
+      ctx.fillRect(xLeft, x.bottom, xRight - xLeft, boxHeight);
+
+      ctx.strokeStyle = "black"; // 枠線を黒に設定
+      ctx.lineWidth = x.grid.lineWidth; // X軸の太さと統一
+      ctx.strokeRect(xLeft, x.bottom, xRight - xLeft, boxHeight);
     });
 
-    const boxHeight = maxLabelHeight + padding; // 动态计算黑框的高度
-    const lineWidth = xAxis.options.grid.lineWidth || 1; // X 轴的线宽
-
-    const left = xAxis.left;
-    const right = xAxis.right;
-    const top = xAxis.top + lineWidth / 2; // 让边框紧贴 X 轴
-    const bottom = top + boxHeight;
-
-    // 设置线条样式
+    // 🎯 X軸の下に1本の分割線を引く（連続的なボックスにするため）
     ctx.strokeStyle = "black";
-    ctx.lineWidth = lineWidth;
-
-    // 绘制黑色矩形边框（确保所有边都可见）
-    ctx.strokeRect(left, top, right - left, boxHeight);
-
-    // 计算每个标签的宽度，确保分割线均匀
-    const numLabels = xAxis.ticks.length;
-    const segmentWidth = (right - left) / numLabels; // 平均分配宽度
-
-    // 绘制垂直分割线（均匀分布）
-    for (let i = 1; i < numLabels; i++) {
-      const x = left + i * segmentWidth;
-
-      ctx.beginPath();
-      ctx.moveTo(x, top);
-      ctx.lineTo(x, bottom);
-      ctx.stroke();
-    }
-
-    // **手动绘制底边，防止 padding 过大导致底边消失**
+    ctx.lineWidth = x.grid.lineWidth;
     ctx.beginPath();
-    ctx.moveTo(left, bottom);
-    ctx.lineTo(right, bottom);
+    ctx.moveTo(chartArea.left, yBottom);
+    ctx.lineTo(chartArea.right, yBottom);
     ctx.stroke();
 
-    // **手动绘制最右侧的边框，确保其粗细正确**
-    ctx.beginPath();
-    ctx.moveTo(right, top);
-    ctx.lineTo(right, bottom);
-    ctx.stroke();
+    ctx.restore(); // 🎯 描画状態を元に戻す
   },
 };
