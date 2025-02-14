@@ -23,7 +23,7 @@ const options = {
   scales: {
     x: {
       ticks: {
-        color: "black", // 确保 X 轴的文字是黑色
+        color: "black", // 文字颜色黑色
         font: {
           weight: "bold",
         },
@@ -39,19 +39,30 @@ const BlackBoxPlugin = {
     const xAxis = chart.scales.x;
     if (!xAxis) return;
 
-    const boxHeight = 24; // 边框高度
+    const boxHeight = 24; // 底部矩形边框的高度
     const lineWidth = xAxis.options.grid.lineWidth || 1; // X 轴的线宽
 
     // 计算边框的范围
     const left = xAxis.left;
     const right = xAxis.right;
-    const top = xAxis.top + lineWidth / 2; // 上边缘与 X 轴对齐
+    const top = xAxis.top + lineWidth / 2; // 让边框紧贴 X 轴
     const bottom = top + boxHeight;
 
-    // 绘制透明填充的黑色边框
+    // 绘制透明填充的黑色矩形边框
     ctx.strokeStyle = "black";
     ctx.lineWidth = lineWidth;
     ctx.strokeRect(left, top, right - left, boxHeight);
+
+    // 绘制垂直分割线
+    xAxis.ticks.forEach((_tick: any, index: number) => {
+      if (index === 0) return; // 忽略最左侧的 Y 轴（避免多余的线）
+      const x = xAxis.getPixelForTick(index);
+
+      ctx.beginPath();
+      ctx.moveTo(x, top); // 从黑框顶部开始
+      ctx.lineTo(x, bottom); // 画到底部
+      ctx.stroke();
+    });
   },
 };
 
