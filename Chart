@@ -34,4 +34,38 @@ const options = {
 
 const BlackBoxPlugin = {
   id: "blackBox",
-  beforeDraw: (chart: any) =>
+  beforeDraw: (chart: any) => {
+    const ctx = chart.ctx;
+    const xAxis = chart.scales.x;
+    if (!xAxis) return;
+
+    const boxHeight = 24; // 黑框高度
+    const padding = 4; // 文字与黑框的间隔
+
+    // 计算黑框的范围
+    const left = xAxis.left;
+    const right = xAxis.right;
+    const top = xAxis.top + 2; // 紧贴 X 轴
+    const bottom = top + boxHeight;
+
+    // 绘制黑色背景框
+    ctx.fillStyle = "black";
+    ctx.fillRect(left, top, right - left, boxHeight);
+
+    // 重新绘制 X 轴刻度标签（覆盖黑框）
+    ctx.fillStyle = "white"; // 文字颜色改为白色，确保可读性
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    xAxis.ticks.forEach((_tick: any, index: number) => {
+      const x = xAxis.getPixelForTick(index);
+      ctx.fillText(xAxis.ticks[index].label, x, top + boxHeight / 2 - padding);
+    });
+  },
+};
+
+const BarChart = () => {
+  return <Bar data={data} options={options} plugins={[BlackBoxPlugin]} />;
+};
+
+export default BarChart;
