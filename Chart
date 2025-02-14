@@ -1,3 +1,22 @@
+const options = {
+  scales: {
+    x: {
+      ticks: {
+        callback: function (value, index, ticks) {
+          return this.getLabelForValue(value).split("\n"); // 自动换行
+        },
+      },
+      labels: [
+        ["Line 1", "Line 2"], // 第一组 Label
+        ["A", "B"], // 第二组 Label
+        ["Row 1", "Row 2"], // 第三组 Label
+      ],
+    },
+  },
+};
+
+
+
 const BlackBoxPlugin = {
   id: "blackBox",
   beforeDraw: (chart: any) => {
