@@ -5,7 +5,7 @@ const BlackBoxPlugin = {
     const xAxis = chart.scales.x;
     if (!xAxis) return;
 
-    const padding = 8; // 额外增加的高度
+    const padding = 12; // 额外增加的高度
     let maxLabelHeight = 0;
 
     // 计算所有 label 的最大高度
@@ -27,7 +27,7 @@ const BlackBoxPlugin = {
     ctx.strokeStyle = "black";
     ctx.lineWidth = lineWidth;
 
-    // 绘制黑色矩形边框
+    // 绘制黑色矩形边框（确保所有边都可见）
     ctx.strokeRect(left, top, right - left, boxHeight);
 
     // 计算每个标签的宽度，确保分割线均匀
@@ -43,6 +43,12 @@ const BlackBoxPlugin = {
       ctx.lineTo(x, bottom);
       ctx.stroke();
     }
+
+    // **手动绘制底边，防止 padding 过大导致底边消失**
+    ctx.beginPath();
+    ctx.moveTo(left, bottom);
+    ctx.lineTo(right, bottom);
+    ctx.stroke();
 
     // **手动绘制最右侧的边框，确保其粗细正确**
     ctx.beginPath();
