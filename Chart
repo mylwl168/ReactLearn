@@ -1,38 +1,65 @@
-const BlackBoxPlugin = {
+import { Chart, Plugin } from "chart.js";
+
+const BlackBoxPlugin: Plugin = {
   id: "blackBox",
   beforeDraw: (chart: Chart) => {
-    const { ctx, scales: { x }, chartArea } = chart;
-    
-    // 🎯 X軸のラベルエリアの高さを決定
-    const boxHeight = 20; // すべてのラベルに統一の高さを設定
-    const yBottom = x.bottom + boxHeight; // X軸の下にボックスを配置
+    const ctx = chart.ctx;
+    const xAxis = chart.scales.x;
+    if (!xAxis) return; // 🎯 X軸が存在しない場合は処理を終了
 
-    ctx.save(); // 🎯 現在の描画状態を保存
+    const padding = 12; // 🎯 余白（ボックスの高さを調整）
+    let maxLabelHeight = 0;
 
-    // 🎯 各ラベルの下に黒いボックスを描画
-    x.ticks.forEach((tick, index) => {
-      const xLeft = x.getPixelForTick(index); // 現在のラベルのX座標
-      const xRight = index < x.ticks.length - 1 
-        ? x.getPixelForTick(index + 1) 
-        : chartArea.right; // 最後のラベルは右端まで広げる
-
-      // 🔳 黒いボックスの描画（透明な背景 + 黒い枠線）
-      ctx.fillStyle = "transparent"; // 内部は透明
-      ctx.fillRect(xLeft, x.bottom, xRight - xLeft, boxHeight);
-
-      ctx.strokeStyle = "black"; // 枠線を黒に設定
-      ctx.lineWidth = x.grid.lineWidth; // X軸の太さと統一
-      ctx.strokeRect(xLeft, x.bottom, xRight - xLeft, boxHeight);
+    // 🎯 すべてのラベルの最大高さを計算
+    xAxis.ticks.forEach((tick) => {
+      const textMetrics = ctx.measureText(String(tick.label)); // `label` は `string | undefined` のため、明示的に `string` へ変換
+      const textHeight = Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxDescent);
+      maxLabelHeight = Math.max(maxLabelHeight, textHeight);
     });
 
-    // 🎯 X軸の下に1本の分割線を引く（連続的なボックスにするため）
+    const boxHeight = maxLabelHeight + padding; // 🎯 ボックスの高さを動的に設定
+    const lineWidth = xAxis.options.grid?.lineWidth || 1; // 🎯 X軸の線幅を取得（デフォルトは1）
+
+    const left = xAxis.left;
+    const right = xAxis.right;
+    const top = xAxis.top + lineWidth / 2; // 🎯 X軸とボックスの境界を揃える
+    const bottom = top + boxHeight;
+
+    // 🎯 線のスタイルを設定
     ctx.strokeStyle = "black";
-    ctx.lineWidth = x.grid.lineWidth;
+    ctx.lineWidth = lineWidth;
+
+    // 🎯 黒いボックスの枠線を描画（全ての辺を可視化）
+    ctx.strokeRect(left, top, right - left, boxHeight);
+
+    // 🎯 各ラベルの幅を均等に計算
+    const numLabels = xAxis.ticks.length;
+    if (numLabels > 1) {
+      const segmentWidth = (right - left) / numLabels; // 🎯 ラベル間の均等な幅を計算
+
+      // 🎯 垂直方向の区切り線を描画
+      for (let i = 1; i < numLabels; i++) {
+        const x = left + i * segmentWidth;
+
+        ctx.beginPath();
+        ctx.moveTo(x, top);
+        ctx.lineTo(x, bottom);
+        ctx.stroke();
+      }
+    }
+
+    // 🎯 **ボックスの底辺を明示的に描画（paddingが大きすぎて消えるのを防ぐ）**
     ctx.beginPath();
-    ctx.moveTo(chartArea.left, yBottom);
-    ctx.lineTo(chartArea.right, yBottom);
+    ctx.moveTo(left, bottom);
+    ctx.lineTo(right, bottom);
     ctx.stroke();
 
-    ctx.restore(); // 🎯 描画状態を元に戻す
+    // 🎯 **ボックスの右端の枠線を明示的に描画（線の太さを維持）**
+    ctx.beginPath();
+    ctx.moveTo(right, top);
+    ctx.lineTo(right, bottom);
+    ctx.stroke();
   },
 };
+
+export default BlackBoxPlugin;
