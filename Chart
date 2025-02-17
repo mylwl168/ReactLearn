@@ -1,65 +1,26 @@
-import { Chart, Plugin } from "chart.js";
+// 假设已经初始化了 jsPDF 对象，例如：
+import jsPDF from "jspdf";
+const doc = new jsPDF();
 
-const BlackBoxPlugin: Plugin = {
-  id: "blackBox",
-  beforeDraw: (chart: Chart) => {
-    const ctx = chart.ctx;
-    const xAxis = chart.scales.x;
-    if (!xAxis) return; // 🎯 X軸が存在しない場合は処理を終了
+// 设置字体和字号
+doc.setFont("helvetica", "normal");
+doc.setFontSize(12);
 
-    const padding = 12; // 🎯 余白（ボックスの高さを調整）
-    let maxLabelHeight = 0;
+const text = "这是带下划线的文本";
+const x = 20; // 文本开始的 x 坐标
+const y = 30; // 文本 baseline 的 y 坐标
 
-    // 🎯 すべてのラベルの最大高さを計算
-    xAxis.ticks.forEach((tick) => {
-      const textMetrics = ctx.measureText(String(tick.label)); // `label` は `string | undefined` のため、明示的に `string` へ変換
-      const textHeight = Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxDescent);
-      maxLabelHeight = Math.max(maxLabelHeight, textHeight);
-    });
+// 绘制文本
+doc.text(text, x, y);
 
-    const boxHeight = maxLabelHeight + padding; // 🎯 ボックスの高さを動的に設定
-    const lineWidth = xAxis.options.grid?.lineWidth || 1; // 🎯 X軸の線幅を取得（デフォルトは1）
+// 计算文本宽度
+const textWidth = doc.getTextWidth(text);
 
-    const left = xAxis.left;
-    const right = xAxis.right;
-    const top = xAxis.top + lineWidth / 2; // 🎯 X軸とボックスの境界を揃える
-    const bottom = top + boxHeight;
+// 设置下划线粗细（可根据需要调整）
+doc.setLineWidth(0.5);
 
-    // 🎯 線のスタイルを設定
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = lineWidth;
+// 绘制下划线（y + 1 可以调整下划线与文本间的距离）
+doc.line(x, y + 1, x + textWidth, y + 1);
 
-    // 🎯 黒いボックスの枠線を描画（全ての辺を可視化）
-    ctx.strokeRect(left, top, right - left, boxHeight);
-
-    // 🎯 各ラベルの幅を均等に計算
-    const numLabels = xAxis.ticks.length;
-    if (numLabels > 1) {
-      const segmentWidth = (right - left) / numLabels; // 🎯 ラベル間の均等な幅を計算
-
-      // 🎯 垂直方向の区切り線を描画
-      for (let i = 1; i < numLabels; i++) {
-        const x = left + i * segmentWidth;
-
-        ctx.beginPath();
-        ctx.moveTo(x, top);
-        ctx.lineTo(x, bottom);
-        ctx.stroke();
-      }
-    }
-
-    // 🎯 **ボックスの底辺を明示的に描画（paddingが大きすぎて消えるのを防ぐ）**
-    ctx.beginPath();
-    ctx.moveTo(left, bottom);
-    ctx.lineTo(right, bottom);
-    ctx.stroke();
-
-    // 🎯 **ボックスの右端の枠線を明示的に描画（線の太さを維持）**
-    ctx.beginPath();
-    ctx.moveTo(right, top);
-    ctx.lineTo(right, bottom);
-    ctx.stroke();
-  },
-};
-
-export default BlackBoxPlugin;
+// 导出 PDF
+doc.save("document.pdf");
