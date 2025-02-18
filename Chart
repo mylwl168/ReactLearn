@@ -1,26 +1,26 @@
-// 假设已经初始化了 jsPDF 对象，例如：
 import jsPDF from "jspdf";
+
+// 初始化 jsPDF 对象
 const doc = new jsPDF();
 
-// 设置字体和字号
-doc.setFont("helvetica", "normal");
-doc.setFontSize(12);
-
-const text = "这是带下划线的文本";
-const x = 20; // 文本开始的 x 坐标
+// 设置文本内容、起始位置和字体大小
+const text = "这是带黑色背景、白色文字的文本";
+const x = 20; // 文本左上角 x 坐标
 const y = 30; // 文本 baseline 的 y 坐标
+const fontSize = 12;
+doc.setFontSize(fontSize);
 
-// 绘制文本
+// 获取文本尺寸（宽度和高度）
+const { w: textWidth, h: textHeight } = doc.getTextDimensions(text);
+
+// 绘制黑色背景
+doc.setFillColor(0, 0, 0); // 设置填充颜色为黑色
+// 注意：y 为文本 baseline，为了让背景框与文本对齐，这里将背景矩形的 y 坐标调整为 y - textHeight
+doc.rect(x, y - textHeight, textWidth, textHeight, "F");
+
+// 设置文字颜色为白色，并绘制文本
+doc.setTextColor(255, 255, 255);
 doc.text(text, x, y);
 
-// 计算文本宽度
-const textWidth = doc.getTextWidth(text);
-
-// 设置下划线粗细（可根据需要调整）
-doc.setLineWidth(0.5);
-
-// 绘制下划线（y + 1 可以调整下划线与文本间的距离）
-doc.line(x, y + 1, x + textWidth, y + 1);
-
-// 导出 PDF
+// 保存 PDF 文件
 doc.save("document.pdf");
