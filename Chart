@@ -1,23 +1,9 @@
-module.exports = {
-  // 其他配置...
-  extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    // 其他扩展...
-    "prettier" // 确保放在最后
-  ],
-  plugins: ["prettier"],
-  rules: {
-    "prettier/prettier": [
-      "error",
-      {
-        printWidth: 200, // 在 ESLint 中通过 Prettier 插件设置 printWidth
-        tabWidth: 2,
-        useTabs: false,
-        semi: true,
-        singleQuote: true,
-        trailingComma: "es5"
-      }
-    ]
-  }
-};
+JsBarcode("#barcode", "123456789012", {
+  displayValue: true,     // 显示条形码下方的数字
+  textAlign: "center",    // 数字居中对齐
+  // 其他配置项，例如：
+  width: 2,
+  height: 100,
+  fontSize: 16,
+  textMargin: 5
+});
