@@ -1,26 +1,23 @@
-import jsPDF from "jspdf";
-
-// 初始化 jsPDF 对象
-const doc = new jsPDF();
-
-// 设置文本内容、起始位置和字体大小
-const text = "这是带黑色背景、白色文字的文本";
-const x = 20; // 文本左上角 x 坐标
-const y = 30; // 文本 baseline 的 y 坐标
-const fontSize = 12;
-doc.setFontSize(fontSize);
-
-// 获取文本尺寸（宽度和高度）
-const { w: textWidth, h: textHeight } = doc.getTextDimensions(text);
-
-// 绘制黑色背景
-doc.setFillColor(0, 0, 0); // 设置填充颜色为黑色
-// 注意：y 为文本 baseline，为了让背景框与文本对齐，这里将背景矩形的 y 坐标调整为 y - textHeight
-doc.rect(x, y - textHeight, textWidth, textHeight, "F");
-
-// 设置文字颜色为白色，并绘制文本
-doc.setTextColor(255, 255, 255);
-doc.text(text, x, y);
-
-// 保存 PDF 文件
-doc.save("document.pdf");
+module.exports = {
+  // 其他配置...
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    // 其他扩展...
+    "prettier" // 确保放在最后
+  ],
+  plugins: ["prettier"],
+  rules: {
+    "prettier/prettier": [
+      "error",
+      {
+        printWidth: 200, // 在 ESLint 中通过 Prettier 插件设置 printWidth
+        tabWidth: 2,
+        useTabs: false,
+        semi: true,
+        singleQuote: true,
+        trailingComma: "es5"
+      }
+    ]
+  }
+};
