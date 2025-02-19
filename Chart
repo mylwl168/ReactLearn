@@ -1,9 +1,32 @@
-JsBarcode("#barcode", "123456789012", {
-  displayValue: true,     // 显示条形码下方的数字
-  textAlign: "center",    // 数字居中对齐
-  // 其他配置项，例如：
-  width: 2,
-  height: 100,
-  fontSize: 16,
-  textMargin: 5
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
+const doc = new jsPDF();
+
+// 第一个 autotable
+autoTable(doc, {
+  head: [["列1", "列2", "列3"]],
+  body: Array(50).fill(["数据1", "数据2", "数据3"]),
+  margin: { top: 20 }
 });
+
+// 获取第一个 autotable 结束位置
+const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY : 20;
+
+// 第二个 autotable，startY 使用第一个表格结束后再加上间隔
+autoTable(doc, {
+  startY: finalY + 10,
+  head: [["列A", "列B", "列C"]],
+  body: Array(50).fill(["数据A", "数据B", "数据C"]),
+  margin: { top: 20 },
+  didDrawPage: (data) => {
+    // 第二个表格每一页上方打印一行文本（例如：“第二个表格说明文本”）
+    // data.settings.startY 表示当前页第二个表格开始绘制的 Y 坐标（如果存在）
+    const textY = data.settings.startY ? data.settings.startY - 10 : data.settings.margin.top - 10;
+    doc.setFontSize(12);
+    // 使用 data.settings.margin.left 作为 X 坐标，也可以自行调整
+    doc.text("第二个表格上方的说明文本", data.settings.margin.left, textY);
+  }
+});
+
+doc.save("table.pdf");
