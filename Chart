@@ -1,53 +1,47 @@
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import { jsPDF } from "jspdf";
+import Chart from "chart.js/auto";
 
-const doc = new jsPDF();
+async function generatePDFWithChart() {
+  // 1. 动态创建 canvas
+  const canvas = document.createElement("canvas");
+  canvas.width = 800; // 设定合适的宽高
+  canvas.height = 400;
+  document.body.appendChild(canvas); // 如果你不想显示，可以不加到 DOM 里
 
-autoTable(doc, {
-  // 定义标题（head）
-  head: [
-    [
-      {
-        content: "第一行标题：合并列，左对齐", 
-        colSpan: 3,
-        styles: { halign: "left" } // 只设置左对齐，边框将在 didParseCell 中处理
-      }
-    ],
-    ["列1", "列2", "列3"]
-  ],
-  // 通过 didParseCell 钩子调整第一行标题的单元格边框
-  didParseCell: function (data) {
-    // 针对 head 区域的第一行（index===0）
-    if (data.section === 'head' && data.row.index === 0) {
-      // 设置上、左、右边框宽度为 0，保留底部边框（例如宽度1）
-      data.cell.styles.lineWidth = 0;
-      // 这里无法直接只去除部分边框，
-      // 所以一种办法是设置整个单元格无边框，然后手动绘制底边
-      // 可在 didDrawCell 或 didDrawPage 中针对该单元格底边重新绘制
-    }
-  },
-  // 在 didDrawCell 中针对第一行标题单元格手动绘制底边
-  didDrawCell: function(data) {
-    if (data.section === 'head' && data.row.index === 0) {
-      const { cell, row } = data;
-      // cell.x 与 cell.y 表示当前单元格左上角坐标
-      // cell.width 表示单元格宽度
-      // 绘制底边线，位置：cell.y + cell.height
-      doc.setLineWidth(0.5); // 设置底边宽度
-      doc.setDrawColor(0); // 黑色
-      doc.line(cell.x, cell.y + cell.height, cell.x + cell.width, cell.y + cell.height);
-    }
-  },
-  // 表格数据（body）
-  body: [
-    ["数据1", "数据2", "数据3"],
-    ["数据4", "数据5", "数据6"],
-    // 更多数据……
-  ],
-  // 可选：设置主题为 grid，以便其他单元格有边框
-  theme: 'grid',
-  // 如果需要，可以设置 margin、样式等其他参数
-  margin: { top: 20 }
-});
+  // 2. 创建 Chart.js 实例
+  new Chart(canvas.getContext("2d")!, {
+    type: "line",
+    data: {
+      labels: ["Jan", "Feb", "Mar", "Apr", "May"],
+      datasets: [
+        {
+          label: "Sales",
+          data: [10, 20, 15, 30, 25],
+          borderColor: "blue",
+          borderWidth: 2,
+          fill: false,
+        },
+      ],
+    },
+  });
 
-doc.save("table.pdf");
+  // **等待 Chart.js 渲染完成**
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  // 3. 转换 canvas 为 base64 图像
+  const imgData = canvas.toDataURL("image/png");
+
+  // 4. 生成 PDF
+  const pdf = new jsPDF();
+  pdf.text("Sales Chart", 10, 10);
+  pdf.addImage(imgData, "PNG", 10, 20, 180, 90);
+
+  // 5. 下载 PDF
+  pdf.save("chart.pdf");
+
+  // 6. 清理 DOM（可选）
+  document.body.removeChild(canvas);
+}
+
+// 调用生成 PDF
+generatePDFWithChart();
