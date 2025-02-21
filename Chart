@@ -34,3 +34,16 @@ ChartJS.register(LineController, LineElement, PointElement, LinearScale, Categor
     const pdf = new jsPDF();
     pdf.text("Sales Chart", 10, 10);
     pdf.addImage(imgData, "PNG", 10, 20, 180, 90);
+
+
+  setTimeout(() => {
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF();
+    pdf.text("Sales Chart", 10, 10);
+    pdf.addImage(imgData, "PNG", 10, 20, 180, 90);
+    pdf.save("chart.pdf");
+
+    // **4️⃣ 清理资源**
+    chart.destroy();
+  }, 500); // 适当等待 ChartJS 渲染
+};
