@@ -1,12 +1,9 @@
-import { Chart as ChartJS, LineController, LineElement, PointElement, LinearScale, CategoryScale } from "chart.js";
-
-ChartJS.register(LineController, LineElement, PointElement, LinearScale, CategoryScale);
-
-
-// **1️⃣ 创建 Canvas，不插入到 TSX**
+// **1️⃣ 创建 Canvas**
   const canvas = document.createElement("canvas");
   canvas.width = 800;
   canvas.height = 400;
+  document.body.appendChild(canvas); // **临时添加到 DOM 确保渲染**
+
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
@@ -25,25 +22,20 @@ ChartJS.register(LineController, LineElement, PointElement, LinearScale, Categor
         },
       ],
     },
-    options: { responsive: false },
+    options: {
+      responsive: false,
+      plugins: {
+        title: {
+          display: true,
+          text: "Sales Data",
+          font: { size: 18 },
+        },
+      },
+    },
   });
 
-  // **3️⃣ 等待 Chart 渲染完成**
-  setTimeout(() => {
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF();
-    pdf.text("Sales Chart", 10, 10);
-    pdf.addImage(imgData, "PNG", 10, 20, 180, 90);
+  // **3️⃣ 确保 ChartJS 渲染完成**
+  await new Promise((resolve) => setTimeout(resolve, 500));
 
-
-  setTimeout(() => {
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF();
-    pdf.text("Sales Chart", 10, 10);
-    pdf.addImage(imgData, "PNG", 10, 20, 180, 90);
-    pdf.save("chart.pdf");
-
-    // **4️⃣ 清理资源**
-    chart.destroy();
-  }, 500); // 适当等待 ChartJS 渲染
-};
+  // **4️⃣ 获取图片数据**
+  const imgData = canvas.toDataURL("image/png");
