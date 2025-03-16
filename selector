@@ -1,3 +1,95 @@
+const { chromium } = require('playwright');
+
+// 复用之前的 getChromeFullPathSelector 函数
+async function getChromeFullPathSelector(locator) {
+    const elementHandle = await locator.elementHandle();
+    if (!elementHandle) {
+        throw new Error('Locator 未定位到任何元素');
+    }
+
+    const selector = await elementHandle.evaluate((element) => {
+        function buildSelector(el) {
+            if (!el || el.id === 'root') {
+                return '#root';
+            }
+            const tagName = el.tagName.toLowerCase();
+            const id = el.id;
+            const parent = el.parentElement;
+            if (id) {
+                return `${buildSelector(parent)} > #${id}`;
+            }
+            const siblings = Array.from(parent.children).filter(
+                child => child.tagName.toLowerCase() === tagName
+            );
+            const isUniqueTag = siblings.length === 1;
+            if (isUniqueTag) {
+                return `${buildSelector(parent)} > ${tagName}`;
+            }
+            const classList = Array.from(el.classList);
+            const hasUnderscoreClass = classList.some(cls => cls.startsWith('_'));
+            const classString = classList.join('.');
+            if (classString && !hasUnderscoreClass) {
+                return `${buildSelector(parent)} > ${tagName}.${classString}`;
+            }
+            const index = siblings.indexOf(el) + 1;
+            return `${buildSelector(parent)} > ${tagName}:nth-child(${index})`;
+        }
+        return buildSelector(element);
+    });
+
+    await elementHandle.dispose();
+    return selector;
+}
+
+// 自定义 locator 函数，带日志打印
+function locatorWithLogging(page) {
+    return function (selector, options) {
+        const locator = page.locator(selector, options);
+        // 异步打印选择器
+        (async () => {
+            try {
+                const cssSelector = await getChromeFullPathSelector(locator);
+                console.log(`Generated CSS Selector: ${cssSelector}`);
+            } catch (error) {
+                console.error(`Failed to generate CSS selector for "${selector}": ${error.message}`);
+            }
+        })();
+        return locator; // 返回原始 locator 对象
+    };
+}
+
+// 示例用法
+(async () => {
+    const browser = await chromium.launch();
+    const page = await browser.newPage();
+    await page.setContent(`
+        <div id="root">
+            <div class="container">
+                <form>
+                    <label class="_hidden"><input type="text"></label>
+                    <label><input type="checkbox"></label>
+                </form>
+                <button id="submit">Click</button>
+            </div>
+        </div>
+    `);
+
+    // 替换 page.locator 为自定义函数
+    const customLocator = locatorWithLogging(page);
+
+    // 使用自定义 locator
+    await customLocator('form input').nth(0).click();  // 打印并点击第一个 input
+    await customLocator('#submit').click();            // 打印并点击 submit 按钮
+
+    await browser.close();
+})();
+
+
+
+
+
+
+
 async function getChromeFullPathSelector(locator) {
     const elementHandle = await locator.elementHandle();
     if (!elementHandle) {
