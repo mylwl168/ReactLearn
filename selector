@@ -1,6 +1,49 @@
 // utils/selectorGenerator.ts
 export const getChromeSelector = async (element: Locator): Promise<string> => {
   return element.evaluate((el) => {
+    // 检查选择器是否在父元素下唯一
+    const isUniqueInParent = (selector: string, element: Element) => {
+      if (!element.parentElement) return true;
+      return element.parentElement.querySelectorAll(selector).length === 1;
+    };
+
+    const getPath = (node: Element): string => {
+      if (node.id) return `#${node.id}`;
+      if (node === document.body) return 'body';
+
+      const parent = node.parentElement;
+      if (!parent) return node.nodeName.toLowerCase();
+
+      // 尝试仅用类名（若类名在父元素下唯一）
+      if (node.className) {
+        const classes = node.className.split(/\s+/).filter(c => c.length > 0);
+        if (classes.length > 0) {
+          const classSelector = `.${classes.join('.')}`;
+          if (isUniqueInParent(classSelector, node)) {
+            return `${getPath(parent)} > ${classSelector}`;
+          }
+        }
+      }
+
+      // 无唯一类名时，使用标签名 + nth-child
+      const siblings = Array.from(parent.children);
+      const index = siblings.indexOf(node) + 1;
+      const tagSelector = `${node.tagName.toLowerCase()}:nth-child(${index})`;
+      return `${getPath(parent)} > ${tagSelector}`;
+    };
+
+    return getPath(el);
+  });
+};
+
+
+
+
+
+
+// utils/selectorGenerator.ts
+export const getChromeSelector = async (element: Locator): Promise<string> => {
+  return element.evaluate((el) => {
     const getPath = (node: Element): string => {
       if (node.id) return `#${node.id}`;
       if (node === document.body) return 'body';
