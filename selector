@@ -1,5 +1,6 @@
 
 async function getChromeFullPathSelector(locator) {
+  async function getChromeFullPathSelector(locator) {
     const elementHandle = await locator.elementHandle();
     if (!elementHandle) {
         throw new Error('Locator 未定位到任何元素');
@@ -26,18 +27,22 @@ async function getChromeFullPathSelector(locator) {
             );
             const isUniqueTag = siblings.length === 1;
 
-            // 如果标签唯一，不带类名
-            if (isUniqueTag) {
+            // 获取类名
+            const classList = Array.from(el.classList);
+            const hasUnderscoreClass = classList.some(cls => cls.startsWith('_'));
+            const classString = classList.join('.');
+
+            // 如果标签唯一且无下划线开头的类名，使用标签名
+            if (isUniqueTag && !hasUnderscoreClass) {
                 return `${buildSelector(parent)} > ${tagName}`;
             }
 
-            // 如果有类名且非唯一，保留所有类
-            const classList = Array.from(el.classList).join('.');
-            if (classList) {
-                return `${buildSelector(parent)} > ${tagName}.${classList}`;
+            // 如果有类名且不以下划线开头，保留所有类
+            if (classString && !hasUnderscoreClass) {
+                return `${buildSelector(parent)} > ${tagName}.${classString}`;
             }
 
-            // 无 ID 和类名，非唯一标签时用 nth-child
+            // 无 ID 或类名以下划线开头或标签非唯一，使用 nth-child
             const index = siblings.indexOf(el) + 1;
             return `${buildSelector(parent)} > ${tagName}:nth-child(${index})`;
         }
@@ -58,11 +63,11 @@ const { chromium } = require('playwright');
         <div id="root">
             <div class="container">
                 <form>
-                    <label><input type="text"></label>
+                    <label class="_hidden"><input type="text"></label>
                     <label><input type="checkbox"></label>
                 </form>
                 <ul>
-                    <li>Item 1</li>
+                    <li class="_item">Item 1</li>
                     <li>Item 2</li>
                 </ul>
                 <button id="submit">Click</button>
@@ -72,15 +77,11 @@ const { chromium } = require('playwright');
 
     console.log(await getChromeFullPathSelector(page.locator('div.container')));          // 输出: #root > div
     console.log(await getChromeFullPathSelector(page.locator('form input').nth(0)));     // 输出: #root > div > form > label:nth-child(1) > input
-    console.log(await getChromeFullPathSelector(page.locator('ul li').nth(1)));          // 输出: #root > div > ul > li:nth-child(2)
+    console.log(await getChromeFullPathSelector(page.locator('ul li').nth(0)));          // 输出: #root > div > ul > li:nth-child(1)
     console.log(await getChromeFullPathSelector(page.locator('#submit')));               // 输出: #root > div > #submit
 
     await browser.close();
 })();
-
-
-
-
 
 
 
