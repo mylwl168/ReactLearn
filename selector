@@ -1,0 +1,56 @@
+// utils/selectorGenerator.ts
+export const getChromeSelector = async (element: Locator): Promise<string> => {
+  return element.evaluate((el) => {
+    const getPath = (node: Element): string => {
+      if (node.id) return `#${node.id}`;
+      if (node === document.body) return 'body';
+
+      const parent = node.parentElement;
+      if (!parent) return node.nodeName.toLowerCase();
+
+      // 获取元素在父节点中的位置（忽略文本节点）
+      const siblings = Array.from(parent.children);
+      const index = siblings.indexOf(node) + 1; // nth-child从1开始
+
+      // 构建当前元素的选择器部分
+      let selector = node.nodeName.toLowerCase();
+      if (node.className) {
+        const validClasses = node.className.split(/\s+/).filter(c => c.length > 0);
+        if (validClasses.length > 0) {
+          selector += `.${validClasses.join('.')}`;
+        } else {
+          selector += `:nth-child(${index})`;
+        }
+      } else {
+        selector += `:nth-child(${index})`;
+      }
+
+      // 递归父节点并拼接路径
+      return `${getPath(parent)} > ${selector}`;
+    };
+
+    return getPath(el);
+  });
+};
+
+
+
+----
+
+import { test, expect } from '@playwright/test';
+import { getChromeSelector } from './utils/selectorGenerator';
+
+test('获取元素选择器', async ({ page }) => {
+  await page.goto('https://example.com');
+  
+  // 原始方式定位元素
+  const element = page.locator('button >> text=Submit');
+  
+  // 调用函数获取选择器字符串
+  const selector = await getChromeSelector(element);
+  console.log('Selector:', selector); // 输出与Chrome一致的路径，如 "body > div#root > button.submit-btn"
+
+  // 使用生成的选择器重新定位元素
+  const sameElement = page.locator(selector);
+  await expect(sameElement).toBeVisible();
+});
