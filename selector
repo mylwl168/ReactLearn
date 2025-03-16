@@ -1,3 +1,101 @@
+
+async function getChromeSelector(locator) {
+    // 获取 Playwright Locator 对应的元素句柄
+    const elementHandle = await locator.elementHandle();
+    if (!elementHandle) {
+        throw new Error('Locator 未定位到任何元素');
+    }
+
+    // 在页面上下文中执行选择器生成逻辑
+    const selector = await elementHandle.evaluate((element) => {
+        // 获取标签名
+        const tagName = element.tagName.toLowerCase();
+
+        // 检查是否存在 ID，若有则优先返回 #id
+        const id = element.id;
+        if (id) {
+            return `#${id}`;
+        }
+
+        // 获取类名并保留所有类
+        const classList = Array.from(element.classList).join('.');
+        if (classList) {
+            return `${tagName}.${classList}`;
+        }
+
+        // 无 ID 和类名，计算 nth-child 索引
+        const parent = element.parentElement;
+        if (!parent) {
+            return tagName; // 根元素直接返回标签名
+        }
+
+        const siblings = Array.from(parent.children).filter(
+            child => child.tagName.toLowerCase() === tagName
+        );
+        const index = siblings.indexOf(element) + 1;
+
+        // 递归获取父级选择器
+        function getParentSelector(el) {
+            const parentTag = el.tagName.toLowerCase();
+            const parentId = el.id;
+            if (parentId) {
+                return `#${parentId}`;
+            }
+            const parentClass = Array.from(el.classList).join('.');
+            if (parentClass) {
+                return `${parentTag}.${parentClass}`;
+            }
+            if (!el.parentElement) {
+                return parentTag;
+            }
+            return `${getParentSelector(el.parentElement)} > ${parentTag}`;
+        }
+
+        // 如果是唯一子元素，直接用标签名，否则用 nth-child
+        if (siblings.length === 1) {
+            return `${getParentSelector(parent)} > ${tagName}`;
+        } else {
+            return `${getParentSelector(parent)} > ${tagName}:nth-child(${index})`;
+        }
+    });
+
+    await elementHandle.dispose(); // 释放句柄
+    return selector;
+}
+
+// 示例用法
+const { chromium } = require('playwright');
+(async () => {
+    const browser = await chromium.launch();
+    const page = await browser.newPage();
+    await page.setContent(`
+        <div class="header"><span>Hello</span></div>
+        <ul><li>Item 1</li><li>Item 2</li></ul>
+        <button id="submit">Click</button>
+    `);
+
+    // 测试不同场景
+    console.log(await getChromeSelector(page.locator('div.header')));        // 输出: div.header
+    console.log(await getChromeSelector(page.locator('ul li').nth(0)));     // 输出: ul > li:nth-child(1)
+    console.log(await getChromeSelector(page.locator('#submit')));          // 输出: #submit
+
+    await browser.close();
+})();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // utils/selectorGenerator.ts
 export const getChromeSelector = async (element: Locator): Promise<string> => {
   return element.evaluate((el) => {
