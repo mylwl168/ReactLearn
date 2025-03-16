@@ -1,65 +1,51 @@
 
-async function getChromeSelector(locator) {
-    // 获取 Playwright Locator 对应的元素句柄
+async function getChromeFullPathSelector(locator) {
     const elementHandle = await locator.elementHandle();
     if (!elementHandle) {
         throw new Error('Locator 未定位到任何元素');
     }
 
-    // 在页面上下文中执行选择器生成逻辑
     const selector = await elementHandle.evaluate((element) => {
-        // 获取标签名
-        const tagName = element.tagName.toLowerCase();
-
-        // 检查是否存在 ID，若有则优先返回 #id
-        const id = element.id;
-        if (id) {
-            return `#${id}`;
-        }
-
-        // 获取类名并保留所有类
-        const classList = Array.from(element.classList).join('.');
-        if (classList) {
-            return `${tagName}.${classList}`;
-        }
-
-        // 无 ID 和类名，计算 nth-child 索引
-        const parent = element.parentElement;
-        if (!parent) {
-            return tagName; // 根元素直接返回标签名
-        }
-
-        const siblings = Array.from(parent.children).filter(
-            child => child.tagName.toLowerCase() === tagName
-        );
-        const index = siblings.indexOf(element) + 1;
-
-        // 递归获取父级选择器
-        function getParentSelector(el) {
-            const parentTag = el.tagName.toLowerCase();
-            const parentId = el.id;
-            if (parentId) {
-                return `#${parentId}`;
+        function buildSelector(el) {
+            if (!el || el.id === 'root') {
+                return '#root'; // 起点为 #root
             }
-            const parentClass = Array.from(el.classList).join('.');
-            if (parentClass) {
-                return `${parentTag}.${parentClass}`;
+
+            const tagName = el.tagName.toLowerCase();
+            const id = el.id;
+            const parent = el.parentElement;
+
+            // ID 优先
+            if (id) {
+                return `${buildSelector(parent)} > #${id}`;
             }
-            if (!el.parentElement) {
-                return parentTag;
+
+            // 获取所有同标签名的兄弟元素
+            const siblings = Array.from(parent.children).filter(
+                child => child.tagName.toLowerCase() === tagName
+            );
+            const isUniqueTag = siblings.length === 1;
+
+            // 如果标签唯一，不带类名
+            if (isUniqueTag) {
+                return `${buildSelector(parent)} > ${tagName}`;
             }
-            return `${getParentSelector(el.parentElement)} > ${parentTag}`;
+
+            // 如果有类名且非唯一，保留所有类
+            const classList = Array.from(el.classList).join('.');
+            if (classList) {
+                return `${buildSelector(parent)} > ${tagName}.${classList}`;
+            }
+
+            // 无 ID 和类名，非唯一标签时用 nth-child
+            const index = siblings.indexOf(el) + 1;
+            return `${buildSelector(parent)} > ${tagName}:nth-child(${index})`;
         }
 
-        // 如果是唯一子元素，直接用标签名，否则用 nth-child
-        if (siblings.length === 1) {
-            return `${getParentSelector(parent)} > ${tagName}`;
-        } else {
-            return `${getParentSelector(parent)} > ${tagName}:nth-child(${index})`;
-        }
+        return buildSelector(element);
     });
 
-    await elementHandle.dispose(); // 释放句柄
+    await elementHandle.dispose();
     return selector;
 }
 
@@ -69,19 +55,28 @@ const { chromium } = require('playwright');
     const browser = await chromium.launch();
     const page = await browser.newPage();
     await page.setContent(`
-        <div class="header"><span>Hello</span></div>
-        <ul><li>Item 1</li><li>Item 2</li></ul>
-        <button id="submit">Click</button>
+        <div id="root">
+            <div class="container">
+                <form>
+                    <label><input type="text"></label>
+                    <label><input type="checkbox"></label>
+                </form>
+                <ul>
+                    <li>Item 1</li>
+                    <li>Item 2</li>
+                </ul>
+                <button id="submit">Click</button>
+            </div>
+        </div>
     `);
 
-    // 测试不同场景
-    console.log(await getChromeSelector(page.locator('div.header')));        // 输出: div.header
-    console.log(await getChromeSelector(page.locator('ul li').nth(0)));     // 输出: ul > li:nth-child(1)
-    console.log(await getChromeSelector(page.locator('#submit')));          // 输出: #submit
+    console.log(await getChromeFullPathSelector(page.locator('div.container')));          // 输出: #root > div
+    console.log(await getChromeFullPathSelector(page.locator('form input').nth(0)));     // 输出: #root > div > form > label:nth-child(1) > input
+    console.log(await getChromeFullPathSelector(page.locator('ul li').nth(1)));          // 输出: #root > div > ul > li:nth-child(2)
+    console.log(await getChromeFullPathSelector(page.locator('#submit')));               // 输出: #root > div > #submit
 
     await browser.close();
 })();
-
 
 
 
