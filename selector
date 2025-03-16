@@ -41,22 +41,20 @@ async function getChromeFullPathSelector(locator) {
     return selector;
 }
 
-// 自定义 locator 函数，带日志打印
-function locatorWithLogging(page) {
-    return function (selector, options) {
-        const locator = page.locator(selector, options);
-        // 异步打印选择器
-        (async () => {
-            try {
-                const cssSelector = await getChromeFullPathSelector(locator);
-                console.log(`Generated CSS Selector: ${cssSelector}`);
-            } catch (error) {
-                console.error(`Failed to generate CSS selector for "${selector}": ${error.message}`);
-            }
-        })();
-        return locator; // 返回原始 locator 对象
-    };
-}
+// 修正为箭头函数并确保返回 Locator
+const locatorWithLogging = (page) => (selector, options) => {
+    const locator = page.locator(selector, options);
+    // 异步打印选择器，不阻塞返回
+    (async () => {
+        try {
+            const cssSelector = await getChromeFullPathSelector(locator);
+            console.log(`Generated CSS Selector: ${cssSelector}`);
+        } catch (error) {
+            console.error(`Failed to generate CSS selector for "${selector}": ${error.message}`);
+        }
+    })();
+    return locator; // 立即返回 Locator 对象
+};
 
 // 示例用法
 (async () => {
